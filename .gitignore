@@ -1,5 +1,6 @@
 # API
 api/target
+api/.env
 
 # APP
 app/node_modules

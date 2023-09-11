@@ -1,7 +1,22 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use api::{establish_connection, models::Chat};
+use diesel::prelude::*;
 
 #[get("/")]
 async fn hello() -> impl Responder {
+    use api::schema::chat::dsl::*;
+
+    let connection = &mut establish_connection();
+    let results = chat
+        .limit(5)
+        .select(Chat::as_select())
+        .load(connection)
+        .expect("Error loading chats");
+
+    for result in results {
+        println!("{}", result.title);
+    }
+
     HttpResponse::Ok().body("Hello world!")
 }
 
