@@ -4,3 +4,6 @@ api/.env
 
 # APP
 app/node_modules
+
+# Example dataset
+check24-messenger-challenge-datasets
