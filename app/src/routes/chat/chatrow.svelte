@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Chat } from './+page';
 	import { Avatar } from '@skeletonlabs/skeleton';
+
 	export let chat: Chat;
 </script>
 
