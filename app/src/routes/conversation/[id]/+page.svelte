@@ -5,7 +5,7 @@
 </script>
 
 <div class="bg-white rounded-b-2xl p-4 flex flex-row items-center gap-3 fixed top-0 left-0 w-full">
-	<a href="/chat">
+	<a href="/conversation">
 		<Icon src={ArrowLeft} size="24" />
 	</a>
 	<div class="flex flex-row gap-2">

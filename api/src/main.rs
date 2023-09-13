@@ -1,4 +1,5 @@
 use actix::{Actor, StreamHandler};
+use actix_cors::Cors;
 use actix_web::{
     get, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
 };
@@ -52,6 +53,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
+            .wrap(Cors::default().allowed_origin("http://localhost:5173"))
             .service(
                 web::scope("/conversation")
                     .service(hello)

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chat } from './+page';
+	import type { Chat } from './types';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
 	export let chat: Chat;
@@ -8,7 +8,7 @@
 </script>
 
 <li>
-	<a class="w-full flex gap-3 p-2" href="chat/{chat.id}">
+	<a class="w-full flex gap-3 p-2" href="conversation/{chat.id}">
 		<Avatar src={chat.avatar} width="w-12 h-12" rounded="rounded-full" class="flex-shrink-0" />
 		<div class="overflow-hidden">
 			<h3 class="font-semibold text-xl">{chat.name}</h3>
