@@ -1,6 +1,10 @@
 use actix::{Actor, StreamHandler};
-use actix_web::{get, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
+};
 use actix_web_actors::ws;
+use api::{establish_connection, models::*};
+use diesel::prelude::*;
 
 struct MyWs;
 
@@ -30,22 +34,29 @@ async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
 
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
+#[get("/list")]
+async fn list_chats() -> Result<impl Responder> {
+    use api::schema::conversation::dsl::*;
 
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
+    let connection = &mut establish_connection();
+    let results = conversation
+        .select(Conversation::as_select())
+        .load(connection)
+        .expect("Error loading conversations");
+
+    Ok(web::Json(results))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .wrap(middleware::Logger::default())
+            .service(
+                web::scope("/conversation")
+                    .service(hello)
+                    .service(list_chats),
+            )
             .route("/ws", web::get().to(index))
     })
     .bind(("127.0.0.1", 8080))?
