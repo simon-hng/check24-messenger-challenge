@@ -1,25 +1,22 @@
+import { faker } from '@faker-js/faker';
 export type Chat = {
 	id: number;
+	avatar: string;
 	name: string;
 	last_message: string;
 	updated_at: Date;
+	count_unread: number;
 };
 
 export function load() {
-	const chats: Chat[] = [
-		{
-			id: 1,
-			name: 'Reyees Herzog',
-			last_message: 'Yes. You can create your own remix',
-			updated_at: new Date('2011-10-10T14:48:00')
-		},
-		{
-			id: 2,
-			name: 'Colton Ruecker',
-			last_message: 'lorem ipsum dolor sit amet',
-			updated_at: new Date('2011-10-10T14:48:00')
-		}
-	];
+	const chats: Chat[] = Array.from(Array(10).keys()).map((chatId) => ({
+		id: chatId,
+		avatar: faker.image.avatar(),
+		name: faker.person.fullName(),
+		last_message: faker.lorem.text(),
+		updated_at: faker.date.recent(),
+		count_unread: faker.number.int({ min: 0, max: 4 })
+	}));
 
 	return {
 		chats

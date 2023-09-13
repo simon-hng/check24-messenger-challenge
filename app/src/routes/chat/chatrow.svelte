@@ -3,16 +3,13 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 
 	export let chat: Chat;
+
+	let last_message_string = '10:15 AM';
 </script>
 
 <li>
 	<a class="w-full flex gap-3 p-2" href="chat/{chat.id}">
-		<Avatar
-			src="https://images.unsplash.com/photo-1617296538902-887900d9b592?ixid=M3w0Njc5ODF8MHwxfGFsbHx8fHx8fHx8fDE2ODc5NzExMDB8&ixlib=rb-4.0.3&w=128&h=128&auto=format&fit=crop"
-			width="w-12 h-12"
-			rounded="rounded-full"
-			class="flex-shrink-0"
-		/>
+		<Avatar src={chat.avatar} width="w-12 h-12" rounded="rounded-full" class="flex-shrink-0" />
 		<div class="overflow-hidden">
 			<h3 class="font-semibold text-xl">{chat.name}</h3>
 			<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
@@ -20,10 +17,10 @@
 			</p>
 		</div>
 		<div class="flex flex-col items-end gap-1 ml-auto">
-			<p class="text-sm whitespace-nowrap">10:35 AM</p>
-			<div>
-				<span class="badge bg-primary-500">1</span>
-			</div>
+			<p class="text-sm whitespace-nowrap">{last_message_string}</p>
+			{#if chat.count_unread}
+				<span class="badge bg-primary-500">{chat.count_unread}</span>
+			{/if}
 		</div>
 	</a>
 </li>
