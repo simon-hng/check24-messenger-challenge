@@ -15,3 +15,5 @@ actix-web = "4"
 actix-web-actors = "4.2.0"
 serde = { version = "1.0.188", features = ["derive"] }
 actix-cors = "0.6.4"
+rand = "0.8.5"
+log = "0.4.20"

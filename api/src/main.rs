@@ -1,4 +1,9 @@
-use actix::{Actor, StreamHandler};
+use std::{
+    sync::{atomic::AtomicUsize, Arc},
+    time::Instant,
+};
+
+use actix::*;
 use actix_cors::Cors;
 use actix_web::{
     get, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
@@ -8,33 +13,8 @@ use api::{establish_connection, models::*};
 use diesel::prelude::*;
 use serde::Serialize;
 
-struct MyWs;
-
-impl Actor for MyWs {
-    type Context = ws::WebsocketContext<Self>;
-}
-
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
-    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        match msg {
-            Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
-            Ok(ws::Message::Text(text)) => ctx.text(text),
-            Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
-            _ => (),
-        }
-    }
-}
-
-async fn index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
-    let resp = ws::start(MyWs {}, &req, stream);
-    println!("{:?}", resp);
-    resp
-}
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
+mod server;
+mod session;
 
 #[get("/list")]
 async fn list_chats() -> Result<impl Responder> {
@@ -69,18 +49,47 @@ async fn list_chats() -> Result<impl Responder> {
     Ok(web::Json(conversation_info))
 }
 
+#[get("/ws")]
+async fn chat_route(
+    req: HttpRequest,
+    stream: web::Payload,
+    srv: web::Data<Addr<server::ChatServer>>,
+) -> Result<HttpResponse, Error> {
+    ws::start(
+        session::WsChatSession {
+            id: 0,
+            hb: Instant::now(),
+            room: "main".to_owned(),
+            name: None,
+            addr: srv.get_ref().clone(),
+        },
+        &req,
+        stream,
+    )
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    // set up applications state
+    // keep a count of the number of visitors
+    let app_state = Arc::new(AtomicUsize::new(0));
+
+    // start chat server actor
+    let server = server::ChatServer::new(app_state.clone()).start();
+
+    log::info!("starting HTTP server at http://localhost:8080");
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::from(app_state.clone()))
+            .app_data(web::Data::new(server.clone()))
             .wrap(middleware::Logger::default())
             .wrap(Cors::default().allowed_origin("http://localhost:5173"))
             .service(
                 web::scope("/conversation")
-                    .service(hello)
-                    .service(list_chats),
+                    .service(list_chats)
+                    .service(chat_route),
             )
-            .route("/ws", web::get().to(index))
     })
     .bind(("127.0.0.1", 8080))?
     .run()

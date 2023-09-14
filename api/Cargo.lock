@@ -328,6 +328,8 @@ dependencies = [
  "diesel",
  "diesel-derive-enum",
  "dotenvy",
+ "log",
+ "rand",
  "serde",
 ]
 
