@@ -6,6 +6,7 @@ use actix_web::{
 use actix_web_actors::ws;
 use api::{establish_connection, models::*};
 use diesel::prelude::*;
+use serde::Serialize;
 
 struct MyWs;
 
@@ -39,13 +40,33 @@ async fn hello() -> impl Responder {
 async fn list_chats() -> Result<impl Responder> {
     use api::schema::conversation::dsl::*;
 
+    #[derive(Serialize)]
+    struct ConversationInfo {
+        id: i32,
+        name: String,
+        last_message: Option<String>,
+        updated_at: chrono::NaiveDateTime,
+        count_unread: i32,
+    }
+
     let connection = &mut establish_connection();
     let results = conversation
         .select(Conversation::as_select())
         .load(connection)
         .expect("Error loading conversations");
 
-    Ok(web::Json(results))
+    let conversation_info: Vec<ConversationInfo> = results
+        .iter()
+        .map(|conv| ConversationInfo {
+            id: conv.id,
+            name: conv.customer_name.to_owned(),
+            updated_at: conv.updated_at,
+            count_unread: 1,
+            last_message: None,
+        })
+        .collect();
+
+    Ok(web::Json(conversation_info))
 }
 
 #[actix_web::main]

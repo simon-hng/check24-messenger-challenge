@@ -39,10 +39,10 @@
 						chat={{
 							id: chat.id,
 							avatar: faker.image.avatar(),
-							name: faker.person.fullName(),
+							name: chat.name,
 							last_message: faker.lorem.text(),
-							updated_at: faker.date.recent(),
-							count_unread: faker.number.int({ min: 0, max: 4 })
+							updated_at: chat.updated_at,
+							count_unread: chat.count_unread
 						}}
 					/>
 				{/each}
