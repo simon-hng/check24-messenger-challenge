@@ -1,12 +1,18 @@
 <script lang="ts">
-	import { websocket } from '@sveu/browser';
+	import { browser } from '$app/environment';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 
 	let currentMessage = '';
 	let messages: any[] = [];
-	const { data, send } = websocket('ws://localhost:8080/conversation/ws');
-	data.subscribe((newMessage) => (messages = [...messages, newMessage]));
+
+	let socket: WebSocket;
+	if (browser) {
+		socket = new WebSocket('ws://localhost:8080/conversation/ws');
+		socket.addEventListener('message', (event) => {
+			messages = [...messages, event.data];
+		});
+	}
 </script>
 
 <div class="grid grid-rows-[auto_1fr_auto] h-screen">
@@ -53,7 +59,7 @@
 				class="variant-filled-primary"
 				type="submit"
 				on:click={() => {
-					send(currentMessage);
+					socket.send(currentMessage);
 				}}>Send</button
 			>
 		</div>
