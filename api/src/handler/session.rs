@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 use actix::prelude::*;
 use actix_web_actors::ws;
 
-use crate::server;
+use crate::handler::server;
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);

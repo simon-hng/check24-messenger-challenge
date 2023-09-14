@@ -8,7 +8,7 @@
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],
-		queryFn: async () => await axios.get('/conversation/list').then((res) => res.data)
+		queryFn: async () => await axios.get('/conversation').then((res) => res.data)
 	});
 </script>
 
