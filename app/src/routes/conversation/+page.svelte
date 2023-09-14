@@ -27,7 +27,9 @@
 	<section>
 		<ul class="list p-2">
 			{#if $query.isLoading}
-				loading...
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
 			{:else if $query.error}
 				error happened
 				{$query.error}

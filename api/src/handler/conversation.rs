@@ -9,7 +9,7 @@ use actix::*;
 use actix_web::*;
 use actix_web_actors::ws;
 use diesel::prelude::*;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 struct ConversationInfo {
@@ -57,7 +57,7 @@ async fn chat_route(
         session::WsChatSession {
             id: 0,
             heart_beat: Instant::now(),
-            room: "main".to_owned(),
+            room: conversation_id,
             name: None,
             addr: srv.get_ref().clone(),
         },

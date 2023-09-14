@@ -2,7 +2,6 @@ use std::time::{Duration, Instant};
 
 use actix::prelude::*;
 use actix_web_actors::ws;
-use serde::Serialize;
 
 use crate::handler::server;
 
