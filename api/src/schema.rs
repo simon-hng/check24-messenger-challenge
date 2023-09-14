@@ -18,7 +18,7 @@ diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::SenderType;
 
-    account (id) {
+    Account (id) {
         id -> Int4,
         #[max_length = 255]
         name -> Varchar,
@@ -31,7 +31,7 @@ diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::ConversationState;
 
-    conversation (id) {
+    Conversation (id) {
         id -> Int4,
         #[max_length = 255]
         customer_name -> Varchar,
@@ -50,7 +50,7 @@ diesel::table! {
     use super::sql_types::MessageType;
     use super::sql_types::SenderType;
 
-    message (id) {
+    Message (id) {
         id -> Int4,
         conversation_id -> Int4,
         message_type -> MessageType,
@@ -62,10 +62,10 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(message -> conversation (conversation_id));
+diesel::joinable!(Message -> Conversation (conversation_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    account,
-    conversation,
-    message,
+    Account,
+    Conversation,
+    Message,
 );

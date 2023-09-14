@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
-#[diesel(table_name = crate::schema::account)]
+#[diesel(table_name = crate::schema::Account)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Account {
     pub id: i32,
@@ -20,7 +20,7 @@ pub enum ConversationState {
 }
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
-#[diesel(table_name = crate::schema::conversation)]
+#[diesel(table_name = crate::schema::Conversation)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Conversation {
     pub id: i32,
@@ -48,7 +48,7 @@ pub enum SenderType {
 }
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::message)]
+#[diesel(table_name = crate::schema::Message)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Message {
     pub id: i32,
