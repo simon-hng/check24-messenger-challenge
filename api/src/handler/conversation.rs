@@ -44,12 +44,15 @@ async fn list_chats() -> Result<impl Responder> {
     Ok(web::Json(conversation_info))
 }
 
-#[get("/ws")]
+#[get("/{id}")]
 async fn chat_route(
+    path: web::Path<String>,
     req: HttpRequest,
     stream: web::Payload,
     srv: web::Data<Addr<server::ChatServer>>,
 ) -> Result<HttpResponse, Error> {
+    let conversation_id = path.into_inner();
+
     ws::start(
         session::WsChatSession {
             id: 0,

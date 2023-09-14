@@ -159,10 +159,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     id: self.id,
                                     name: self.room.clone(),
                                 });
-
-                                ctx.text("joined");
                             } else {
-                                ctx.text("!!! room name is required");
+                                ctx.text("!!! room id is required");
                             }
                         }
                         "/name" => {

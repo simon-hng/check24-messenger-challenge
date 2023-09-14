@@ -1,18 +1,27 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { beforeNavigate } from '$app/navigation';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 
 	let currentMessage = '';
 	let messages: any[] = [];
+	export let data;
 
 	let socket: WebSocket;
 	if (browser) {
 		socket = new WebSocket('ws://localhost:8080/conversation/ws');
+		socket.onopen = () => {
+			socket.send(`/join ${data.conversation_id}`);
+		};
 		socket.addEventListener('message', (event) => {
 			messages = [...messages, event.data];
 		});
 	}
+
+	beforeNavigate(() => {
+		socket.close();
+	});
 
 	const sendHandler = () => {
 		socket.send(currentMessage);
