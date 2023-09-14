@@ -8,7 +8,10 @@
 </script>
 
 <li>
-	<a class="w-full flex gap-3 p-2" href="conversation/{chat.id}">
+	<a
+		class="duration-300 w-full flex gap-3 p-2 bg-surface-hover-token rounded-2xl"
+		href="conversation/{chat.id}"
+	>
 		<Avatar src={chat.avatar} width="w-12 h-12" rounded="rounded-full" class="flex-shrink-0" />
 		<div class="overflow-hidden">
 			<h3 class="font-semibold text-xl">{chat.name}</h3>

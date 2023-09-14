@@ -32,8 +32,6 @@
 				error happened
 				{$query.error}
 			{:else if $query.isSuccess}
-				<p>success</p>
-
 				{#each $query.data as chat}
 					<Chatrow
 						chat={{
