@@ -16,7 +16,34 @@ use serde::Serialize;
 mod server;
 mod session;
 
-#[get("/list")]
+#[get("/")]
+async fn list_accounts() -> Result<impl Responder> {
+    use api::schema::account::dsl::*;
+
+    let connection = &mut establish_connection();
+    let results = account
+        .select(Account::as_select())
+        .load(connection)
+        .expect("failed to load accounts");
+
+    Ok(web::Json(results))
+}
+
+#[get("/{id}")]
+async fn get_account_by_id(path: web::Path<String>) -> Result<impl Responder> {
+    use api::schema::account::dsl::*;
+
+    let account_id: i32 = path.into_inner().parse().unwrap();
+    let connection = &mut establish_connection();
+    let results = account
+        .filter(id.eq(account_id))
+        .first::<api::models::Account>(connection)
+        .expect("failed to load accounts");
+
+    Ok(web::Json(results))
+}
+
+#[get("/")]
 async fn list_chats() -> Result<impl Responder> {
     use api::schema::conversation::dsl::*;
 
@@ -89,6 +116,11 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/conversation")
                     .service(list_chats)
                     .service(chat_route),
+            )
+            .service(
+                web::scope("/account")
+                    .service(list_accounts)
+                    .service(get_account_by_id),
             )
     })
     .bind(("127.0.0.1", 8080))?

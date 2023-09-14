@@ -16,6 +16,19 @@ pub mod sql_types {
 
 diesel::table! {
     use diesel::sql_types::*;
+    use super::sql_types::SenderType;
+
+    account (id) {
+        id -> Int4,
+        #[max_length = 255]
+        name -> Varchar,
+        picture -> Nullable<Bytea>,
+        account_type -> SenderType,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
     use super::sql_types::ConversationState;
 
     conversation (id) {
@@ -27,6 +40,8 @@ diesel::table! {
         state -> ConversationState,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        customer_id -> Nullable<Int4>,
+        service_provider_id -> Nullable<Int4>,
     }
 }
 
@@ -50,6 +65,7 @@ diesel::table! {
 diesel::joinable!(message -> conversation (conversation_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    account,
     conversation,
     message,
 );
