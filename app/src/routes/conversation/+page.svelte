@@ -4,7 +4,7 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import type { Chat } from './types';
 	import axios from 'axios';
-	import Chatrow from './chatrow.svelte';
+	import ChatRow from './chatRow.svelte';
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],
@@ -33,7 +33,7 @@
 				{$query.error}
 			{:else if $query.isSuccess}
 				{#each $query.data as chat}
-					<Chatrow
+					<ChatRow
 						chat={{
 							id: chat.id,
 							avatar: faker.image.avatar(),
