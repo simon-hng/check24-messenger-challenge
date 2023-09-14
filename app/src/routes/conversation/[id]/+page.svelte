@@ -13,6 +13,12 @@
 			messages = [...messages, event.data];
 		});
 	}
+
+	const sendHandler = () => {
+		socket.send(currentMessage);
+		messages = [...messages, currentMessage];
+		currentMessage = '';
+	};
 </script>
 
 <div class="grid grid-rows-[auto_1fr_auto] h-screen">
@@ -55,13 +61,7 @@
 				placeholder="Write a message..."
 				rows="1"
 			/>
-			<button
-				class="variant-filled-primary"
-				type="submit"
-				on:click={() => {
-					socket.send(currentMessage);
-				}}>Send</button
-			>
+			<button class="variant-filled-primary" type="submit" on:click={sendHandler}>Send</button>
 		</div>
 	</div>
 </div>
