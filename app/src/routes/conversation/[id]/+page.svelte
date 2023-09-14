@@ -1,10 +1,15 @@
 <script lang="ts">
+	import { websocket } from '@sveu/browser';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
-	export let data;
+
+	let currentMessage = '';
+	let messages: any[] = [];
+	const { data, send } = websocket('ws://localhost:8080/conversation/ws');
+	data.subscribe((newMessage) => (messages = [...messages, newMessage]));
 </script>
 
-<div class="bg-white rounded-b-2xl p-4 flex flex-row items-center gap-3 fixed top-0 left-0 w-full">
+<div class="rounded-b-2xl p-4 flex flex-row items-center gap-3 top-0 left-0 w-full">
 	<a href="/conversation">
 		<Icon src={ArrowLeft} size="24" />
 	</a>
@@ -22,4 +27,27 @@
 	</div>
 </div>
 
-{data.params.id}
+{#if messages.length}
+	{#each messages as message}
+		<p>{message}</p>
+	{/each}
+{/if}
+
+<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
+	<button class="input-group-shim">+</button>
+	<textarea
+		bind:value={currentMessage}
+		class="bg-transparent border-0 ring-0"
+		name="prompt"
+		id="prompt"
+		placeholder="Write a message..."
+		rows="1"
+	/>
+	<button
+		class="variant-filled-primary"
+		type="submit"
+		on:click={() => {
+			send(currentMessage);
+		}}>Send</button
+	>
+</div>

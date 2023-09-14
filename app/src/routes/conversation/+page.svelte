@@ -12,8 +12,8 @@
 	});
 </script>
 
-<div class="h-screen bg-white">
-	<div class="p-4 border-b border-surface">
+<div class="h-screen">
+	<div class="p-4 border-b border-surface-500">
 		<div class="flex items-center gap-3">
 			<Avatar
 				src="https://images.unsplash.com/photo-1617296538902-887900d9b592?ixid=M3w0Njc5ODF8MHwxfGFsbHx8fHx8fHx8fDE2ODc5NzExMDB8&ixlib=rb-4.0.3&w=128&h=128&auto=format&fit=crop"
