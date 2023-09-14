@@ -3,7 +3,7 @@ use std::time::Instant;
 use crate::{
     establish_connection,
     handler::{server, session},
-    models::Conversation,
+    models,
 };
 use actix::*;
 use actix_web::*;
@@ -22,11 +22,11 @@ struct ConversationInfo {
 
 #[get("/")]
 async fn list_chats() -> Result<impl Responder> {
-    use crate::schema::conversation::dsl::*;
+    use crate::schema::Conversation::dsl::*;
 
     let connection = &mut establish_connection();
-    let results = conversation
-        .select(Conversation::as_select())
+    let results = Conversation
+        .select(models::Conversation::as_select())
         .load(connection)
         .expect("Error loading conversations");
 
