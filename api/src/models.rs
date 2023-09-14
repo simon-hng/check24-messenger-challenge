@@ -29,6 +29,8 @@ pub struct Conversation {
     pub state: ConversationState,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
+    pub customer_id: Option<i32>,
+    pub service_provider_id: Option<i32>,
 }
 
 #[derive(Debug, diesel_derive_enum::DbEnum)]

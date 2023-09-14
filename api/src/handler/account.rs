@@ -22,7 +22,7 @@ pub async fn get_account_by_id(path: web::Path<String>) -> Result<impl Responder
     let account_id: i32 = path.into_inner().parse().unwrap();
     let connection = &mut establish_connection();
     let results = Account
-        .filter(id.eq(account_id))
+        .find(account_id)
         .first::<crate::models::Account>(connection)
         .expect("failed to load accounts");
 

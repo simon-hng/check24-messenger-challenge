@@ -9,7 +9,7 @@ use actix::*;
 use actix_web::*;
 use actix_web_actors::ws;
 use diesel::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[derive(Serialize)]
 struct ConversationInfo {
@@ -42,6 +42,37 @@ async fn list_chats() -> Result<impl Responder> {
         .collect();
 
     Ok(web::Json(conversation_info))
+}
+
+#[derive(Serialize)]
+struct ConversationDetail {
+    id: i32,
+    name: String,
+    last_message: Option<String>,
+    updated_at: chrono::NaiveDateTime,
+    count_unread: i32,
+}
+
+#[get("/detail/{id}")]
+async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
+    use crate::schema::Conversation::dsl::*;
+
+    let conversation_id: i32 = path.into_inner().parse().unwrap();
+    let connection = &mut establish_connection();
+    let conv = Conversation
+        .find(conversation_id)
+        .first::<crate::models::Conversation>(connection)
+        .expect("failed to load accounts");
+
+    let response = ConversationInfo {
+        id: conv.id,
+        name: conv.customer_name.to_owned(),
+        updated_at: conv.updated_at,
+        count_unread: 1,
+        last_message: None,
+    };
+
+    Ok(web::Json(response))
 }
 
 #[get("/{id}")]
