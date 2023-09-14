@@ -56,7 +56,7 @@ async fn chat_route(
     ws::start(
         session::WsChatSession {
             id: 0,
-            hb: Instant::now(),
+            heart_beat: Instant::now(),
             room: "main".to_owned(),
             name: None,
             addr: srv.get_ref().clone(),

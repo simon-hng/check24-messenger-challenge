@@ -2,52 +2,29 @@ use std::time::{Duration, Instant};
 
 use actix::prelude::*;
 use actix_web_actors::ws;
+use serde::Serialize;
 
 use crate::handler::server;
 
-/// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
-
-/// How long before lack of client response causes a timeout
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[derive(Debug)]
 pub struct WsChatSession {
-    /// unique session id
     pub id: usize,
-
-    /// Client must send ping at least once per 10 seconds (CLIENT_TIMEOUT),
-    /// otherwise we drop connection.
-    pub hb: Instant,
-
-    /// joined room
+    pub heart_beat: Instant,
     pub room: String,
-
-    /// peer name
     pub name: Option<String>,
-
-    /// Chat server
     pub addr: Addr<server::ChatServer>,
 }
 
 impl WsChatSession {
-    /// helper method that sends ping to client every 5 seconds (HEARTBEAT_INTERVAL).
-    ///
-    /// also this method checks heartbeats from client
-    fn hb(&self, ctx: &mut ws::WebsocketContext<Self>) {
+    fn heart_beat(&self, ctx: &mut ws::WebsocketContext<Self>) {
         ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
-            // check client heartbeats
-            if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
-                // heartbeat timed out
+            if Instant::now().duration_since(act.heart_beat) > CLIENT_TIMEOUT {
                 println!("Websocket Client heartbeat failed, disconnecting!");
-
-                // notify chat server
                 act.addr.do_send(server::Disconnect { id: act.id });
-
-                // stop actor
                 ctx.stop();
-
-                // don't try to send a ping
                 return;
             }
 
@@ -59,11 +36,9 @@ impl WsChatSession {
 impl Actor for WsChatSession {
     type Context = ws::WebsocketContext<Self>;
 
-    /// Method is called on actor start.
     /// We register ws session with ChatServer
     fn started(&mut self, ctx: &mut Self::Context) {
-        // we'll start heartbeat process on session start.
-        self.hb(ctx);
+        self.heart_beat(ctx);
 
         // register self in chat server. `AsyncContext::wait` register
         // future within context, but context waits until this future resolves
@@ -88,7 +63,6 @@ impl Actor for WsChatSession {
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        // notify chat server
         self.addr.do_send(server::Disconnect { id: self.id });
         Running::Stop
     }
@@ -117,11 +91,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
         log::debug!("WEBSOCKET MESSAGE: {msg:?}");
         match msg {
             ws::Message::Ping(msg) => {
-                self.hb = Instant::now();
+                self.heart_beat = Instant::now();
                 ctx.pong(&msg);
             }
             ws::Message::Pong(_) => {
-                self.hb = Instant::now();
+                self.heart_beat = Instant::now();
             }
             ws::Message::Text(text) => {
                 let m = text.trim();
@@ -147,10 +121,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                                     }
                                     fut::ready(())
                                 })
-                                .wait(ctx)
-                            // .wait(ctx) pauses all events in context,
-                            // so actor wont receive any new messages until it get list
-                            // of rooms back
+                                .wait(ctx) // pauses all events in context,
                         }
                         "/join" => {
                             if v.len() == 2 {
