@@ -8,7 +8,7 @@ edition = "2021"
 members = [".", "migration"]
 
 [dependencies]
-entity = { path = "entity" }
+# entity = { path = "entity" }
 migration = { path = "migration" }
 actix = "0.13"
 dotenvy = "0.15"

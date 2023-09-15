@@ -6,21 +6,35 @@ use actix_web::{middleware, web, App, HttpServer};
 
 use api::handler::{account, conversation};
 
+use dotenvy::dotenv;
+use migration::{Migrator, MigratorTrait};
+use sea_orm::{Database, DatabaseConnection};
+use std::env;
+
+#[derive(Debug, Clone)]
+pub struct AppState {
+    conn: DatabaseConnection,
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
+    // establish connection to database and apply migrations
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let conn = Database::connect(&database_url).await.unwrap();
+    Migrator::up(&conn, None).await.unwrap();
+
     // set up applications state
     // keep a count of the number of visitors
-    let app_state = Arc::new(AtomicUsize::new(0));
+    let app_state = AppState { conn };
 
-    // start chat server actor
-    let server = api::handler::server::ChatServer::new(app_state.clone()).start();
-
-    log::info!("starting HTTP server at http://localhost:8080");
+    // let server = api::handler::server::ChatServer::new(app_state.clone()).start();
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::from(app_state.clone()))
-            .app_data(web::Data::new(server.clone()))
+            .app_data(web::Data::new(app_state.clone()))
+            // .app_data(web::Data::new(server.clone()))
             .wrap(middleware::Logger::default())
             .wrap(Cors::default().allowed_origin("http://localhost:5173"))
             .service(

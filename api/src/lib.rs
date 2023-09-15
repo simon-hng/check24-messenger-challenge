@@ -1,6 +1,6 @@
 use dotenvy::dotenv;
-use sea_orm::{Database, DatabaseConnection};
 use std::env;
+use sea_orm::{Database, DatabaseConnection};
 
 pub mod handler;
 pub mod models;
