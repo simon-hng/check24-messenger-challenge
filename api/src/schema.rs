@@ -71,4 +71,9 @@ diesel::joinable!(account_conversation -> account (account_id));
 diesel::joinable!(account_conversation -> conversation (conversation_id));
 diesel::joinable!(message -> conversation (conversation_id));
 
-diesel::allow_tables_to_appear_in_same_query!(account, account_conversation, conversation, message,);
+diesel::allow_tables_to_appear_in_same_query!(
+    account,
+    account_conversation,
+    conversation,
+    message,
+);

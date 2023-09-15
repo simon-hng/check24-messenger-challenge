@@ -57,10 +57,10 @@ struct ConversationDetail {
 async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
     use crate::schema::conversation::dsl::*;
 
-    let conversation_id: i32 = path.into_inner().parse().unwrap();
+    let conv_id: i32 = path.into_inner().parse().unwrap();
     let connection = &mut establish_connection();
     let conv = conversation
-        .find(conversation_id)
+        .find(conv_id)
         .first::<crate::models::Conversation>(connection)
         .expect("failed to load accounts");
 
@@ -75,7 +75,7 @@ async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
     Ok(web::Json(response))
 }
 
-#[get("/{id}")]
+#[get("/ws")]
 async fn chat_route(
     path: web::Path<String>,
     req: HttpRequest,

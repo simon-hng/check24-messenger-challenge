@@ -53,7 +53,7 @@ pub struct Conversation {
 #[diesel(belongs_to(Conversation))]
 #[diesel(table_name = account_conversation)]
 #[diesel(primary_key(account_id, conversation_id))]
-pub struct BookAuthor {
+pub struct AccountConversation {
     pub account_id: i32,
     pub conversation_id: i32,
 }
