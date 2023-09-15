@@ -1,14 +1,9 @@
 use std::time::Instant;
 
-use crate::{
-    establish_connection,
-    handler::{server, session},
-    models,
-};
+use crate::handler::{server, session};
 use actix::*;
 use actix_web::*;
 use actix_web_actors::ws;
-use diesel::prelude::*;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -22,6 +17,7 @@ struct ConversationInfo {
 
 #[get("/")]
 async fn list_chats() -> Result<impl Responder> {
+    /*
     use crate::schema::conversation::dsl::*;
 
     let connection = &mut establish_connection();
@@ -40,8 +36,9 @@ async fn list_chats() -> Result<impl Responder> {
             last_message: None,
         })
         .collect();
+    */
 
-    Ok(web::Json(conversation_info))
+    Ok("TODO")
 }
 
 #[derive(Serialize)]
@@ -55,6 +52,7 @@ struct ConversationDetail {
 
 #[get("/detail/{id}")]
 async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
+    /*
     use crate::schema::conversation::dsl::*;
 
     let conv_id: i32 = path.into_inner().parse().unwrap();
@@ -71,8 +69,9 @@ async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
         count_unread: 1,
         last_message: None,
     };
+    */
 
-    Ok(web::Json(response))
+    Ok("TODO")
 }
 
 #[get("/ws")]
