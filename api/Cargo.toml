@@ -8,7 +8,7 @@ edition = "2021"
 members = [".", "migration"]
 
 [dependencies]
-# entity = { path = "entity" }
+entity = { path = "entity" }
 migration = { path = "migration" }
 actix = "0.13"
 dotenvy = "0.15"
@@ -19,4 +19,9 @@ serde = { version = "1.0.188", features = ["derive"] }
 actix-cors = "0.6.4"
 rand = "0.8.5"
 log = "0.4.20"
-sea-orm = { version = "0.12.2", features = ["runtime-actix"] }
+sea-orm = { version = "0.12.2", features = [
+  "runtime-actix",
+  "sqlx-postgres",
+  "runtime-tokio-rustls",
+] }
+tracing-subscriber = "0.3.17"
