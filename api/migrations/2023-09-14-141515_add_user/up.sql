@@ -6,8 +6,8 @@ CREATE TABLE account (
   account_type sender_type NOT NULL
 );
 
-ALTER TABLE conversation
-ADD COLUMN customer_id INTEGER REFERENCES account(id);
-
-ALTER TABLE conversation
-ADD COLUMN service_provider_id INTEGER REFERENCES account(id);
+CREATE TABLE account_conversation (
+  account_id INTEGER REFERENCES account(id),
+  conversation_id INTEGER REFERENCES conversation(id),
+  PRIMARY KEY(account_id, conversation_id)
+)

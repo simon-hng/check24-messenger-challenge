@@ -22,10 +22,10 @@ struct ConversationInfo {
 
 #[get("/")]
 async fn list_chats() -> Result<impl Responder> {
-    use crate::schema::Conversation::dsl::*;
+    use crate::schema::conversation::dsl::*;
 
     let connection = &mut establish_connection();
-    let results = Conversation
+    let results = conversation
         .select(models::Conversation::as_select())
         .load(connection)
         .expect("Error loading conversations");
@@ -55,11 +55,11 @@ struct ConversationDetail {
 
 #[get("/detail/{id}")]
 async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
-    use crate::schema::Conversation::dsl::*;
+    use crate::schema::conversation::dsl::*;
 
     let conversation_id: i32 = path.into_inner().parse().unwrap();
     let connection = &mut establish_connection();
-    let conv = Conversation
+    let conv = conversation
         .find(conversation_id)
         .first::<crate::models::Conversation>(connection)
         .expect("failed to load accounts");

@@ -4,10 +4,10 @@ use diesel::prelude::*;
 
 #[get("/")]
 pub async fn list_accounts() -> Result<impl Responder> {
-    use crate::schema::Account::dsl::*;
+    use crate::schema::account::dsl::*;
 
     let connection = &mut establish_connection();
-    let results = Account
+    let results = account
         .select(models::Account::as_select())
         .load(connection)
         .expect("failed to load accounts");
@@ -17,11 +17,11 @@ pub async fn list_accounts() -> Result<impl Responder> {
 
 #[get("/{id}")]
 pub async fn get_account_by_id(path: web::Path<String>) -> Result<impl Responder> {
-    use crate::schema::Account::dsl::*;
+    use crate::schema::account::dsl::*;
 
     let account_id: i32 = path.into_inner().parse().unwrap();
     let connection = &mut establish_connection();
-    let results = Account
+    let results = account
         .find(account_id)
         .first::<crate::models::Account>(connection)
         .expect("failed to load accounts");
