@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
+members = [".", "migration"]
 
 [dependencies]
+entity = { path = "entity" }
+migration = { path = "migration" }
 actix = "0.13"
 dotenvy = "0.15"
 chrono = { version = "0.4.30", features = ["serde"] }

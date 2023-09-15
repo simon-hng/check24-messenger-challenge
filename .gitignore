@@ -1,5 +1,5 @@
 # API
-api/target
+**/target
 api/.env
 
 # APP
