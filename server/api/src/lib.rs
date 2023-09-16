@@ -1,15 +1,12 @@
-use std::sync::{atomic::AtomicUsize, Arc};
-
-use actix::Actor;
 use actix_cors::Cors;
 use actix_web::{middleware, web, App, HttpServer};
-
-use api::handler::{account, conversation};
-
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
 use std::env;
+
+mod resource;
+use resource::*;
 
 #[derive(Debug, Clone)]
 pub struct AppState {
@@ -17,7 +14,7 @@ pub struct AppState {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+pub async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "debug");
     tracing_subscriber::fmt::init();
 

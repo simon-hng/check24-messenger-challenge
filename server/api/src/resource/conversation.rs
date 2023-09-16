@@ -1,10 +1,11 @@
 use std::time::Instant;
 
-use crate::handler::{server, session};
 use actix::*;
 use actix_web::*;
 use actix_web_actors::ws;
 use serde::Serialize;
+
+use crate::resource::{server, session};
 
 #[derive(Serialize)]
 struct ConversationInfo {

@@ -403,6 +403,7 @@ dependencies = [
  "rand",
  "sea-orm",
  "serde",
+ "service",
  "tracing-subscriber",
 ]
 
@@ -2539,6 +2540,17 @@ dependencies = [
  "ryu",
  "serde",
 ]
+
+[[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "api",
+]
+
+[[package]]
+name = "service"
+version = "0.1.0"
 
 [[package]]
 name = "sha1"
