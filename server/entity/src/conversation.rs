@@ -2,8 +2,9 @@
 
 use super::sea_orm_active_enums::ConversationState;
 use sea_orm::entity::prelude::*;
+use serde::Serialize;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize)]
 #[sea_orm(table_name = "conversation")]
 pub struct Model {
     #[sea_orm(primary_key)]

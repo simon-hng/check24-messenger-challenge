@@ -6,5 +6,8 @@ edition = "2021"
 [workspace]
 members = [".", "api", "migration", "entity", "service"]
 
+[workspace.dependencies]
+serde = { version = "1.0.188", features = ["derive"] }
+
 [dependencies]
 api = { path = "api" }

@@ -1,19 +1,18 @@
 use actix_web::{get, web, Responder, Result};
+use entity::prelude::Account;
+use sea_orm::EntityTrait;
+
+use crate::AppState;
 
 #[get("/")]
-pub async fn list_accounts() -> Result<impl Responder> {
-    /*
-    use crate::schema::account::dsl::*;
+pub async fn list_accounts(data: web::Data<AppState>) -> Result<impl Responder> {
+    let conn = &data.conn;
+    let accounts = Account::find()
+        .all(conn)
+        .await
+        .expect("Failed to load accounts");
 
-    let connection = &mut establish_connection();
-    let results = account
-        .select(models::Account::as_select())
-        .load(connection)
-        .expect("failed to load accounts");
-
-    Ok(web::Json(results))
-    */
-    Ok("TODO")
+    Ok(web::Json(accounts))
 }
 
 #[get("/{id}")]

@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = { workspace = true }
 service = { path = "../service/" }
 entity = { path = "../entity" }
 migration = { path = "../migration" }
@@ -14,7 +15,6 @@ dotenvy = "0.15"
 chrono = { version = "0.4.30", features = ["serde"] }
 actix-web = "4"
 actix-web-actors = "4.2.0"
-serde = { version = "1.0.188", features = ["derive"] }
 actix-cors = "0.6.4"
 rand = "0.8.5"
 log = "0.4.20"
@@ -22,5 +22,7 @@ sea-orm = { version = "0.12.2", features = [
   "runtime-actix",
   "sqlx-postgres",
   "runtime-tokio-rustls",
+  "with-json",
 ] }
 tracing-subscriber = "0.3.17"
+serde_json = "1.0.107"
