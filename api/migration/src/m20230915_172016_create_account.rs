@@ -15,6 +15,7 @@ pub enum AccountType {
     #[iden = "service_provider"]
     ServiceProvider,
 }
+
 #[derive(DeriveIden)]
 pub enum Account {
     Table,
