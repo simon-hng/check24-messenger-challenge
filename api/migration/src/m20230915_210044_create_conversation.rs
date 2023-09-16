@@ -113,6 +113,11 @@ impl MigrationTrait for Migration {
                             .integer()
                             .not_null(),
                     )
+                    .primary_key(
+                        Index::create()
+                            .col(ConversationAccount::AccountId)
+                            .col(ConversationAccount::ConversationId),
+                    )
                     .foreign_key(
                         ForeignKey::create()
                             .name("conversation_id")
