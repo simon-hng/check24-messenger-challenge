@@ -47,18 +47,7 @@ pub async fn main() -> std::io::Result<()> {
                 secret_key.clone(),
             ))
             .wrap(Cors::default().allowed_origin("http://localhost:5173"))
-            .service(
-                web::scope("/conversation")
-                    .service(conversation::list_chats)
-                    .service(conversation::chat_route),
-            )
-            .service(
-                web::scope("/account")
-                    .service(account::list_accounts)
-                    .service(account::who_am_i)
-                    .service(account::login)
-                    .service(account::get_account_by_id),
-            )
+            .configure(auth::auth_service)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
