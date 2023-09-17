@@ -39,9 +39,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@auth/core": "^0.15.0",
-    "@auth/sveltekit": "^0.3.7",
     "@tanstack/svelte-query": "^4.35.3",
-    "axios": "^1.5.0"
+    "axios": "^1.5.0",
+    "svelte-forms-lib": "^2.0.1"
   }
 }

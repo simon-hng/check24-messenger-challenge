@@ -11,11 +11,13 @@ service = { path = "../service/" }
 entity = { path = "../entity" }
 migration = { path = "../migration" }
 actix = "0.13"
-dotenvy = "0.15"
-chrono = { version = "0.4.30", features = ["serde"] }
 actix-web = "4"
 actix-web-actors = "4.2.0"
 actix-cors = "0.6.4"
+actix-identity = "0.6.0"
+actix-session = { version = "0.8.0", features = ["cookie-session"] }
+dotenvy = "0.15"
+chrono = { version = "0.4.30", features = ["serde"] }
 rand = "0.8.5"
 log = "0.4.20"
 sea-orm = { version = "0.12.2", features = [
