@@ -42,7 +42,7 @@ async fn logout(user: Identity) -> impl Responder {
     HttpResponse::Ok()
 }
 
-pub fn auth_service(cfg: &mut web::ServiceConfig) {
+pub fn init_service(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/auth")
             .service(login)

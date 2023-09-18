@@ -47,7 +47,8 @@ pub async fn main() -> std::io::Result<()> {
                 secret_key.clone(),
             ))
             .wrap(Cors::default().allowed_origin("http://localhost:5173"))
-            .configure(auth::auth_service)
+            .configure(auth::init_service)
+            .configure(conversation::init_service)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

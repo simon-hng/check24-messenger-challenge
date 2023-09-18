@@ -1,11 +1,17 @@
 use std::time::Instant;
 
+use ::entity::{conversation, prelude::Conversation};
 use actix::*;
+use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
+use sea_orm::*;
 use serde::Serialize;
 
-use crate::resource::{server, session};
+use crate::{
+    resource::{server, session},
+    AppState,
+};
 
 #[derive(Serialize)]
 struct ConversationInfo {
@@ -17,29 +23,25 @@ struct ConversationInfo {
 }
 
 #[get("/")]
-async fn list_chats() -> Result<impl Responder> {
-    /*
-    use crate::schema::conversation::dsl::*;
+async fn get_conversations(
+    user: Option<Identity>,
+    data: web::Data<AppState>,
+) -> Result<impl Responder> {
+    let conversations: Vec<conversation::Model> = Conversation::find()
+        .from_raw_sql(Statement::from_sql_and_values(
+            DbBackend::Postgres,
+            r#"SELECT c.*
+            FROM Conversation c
+            JOIN Conversation_Account ca ON c.conversation_id = ca.conversation_id
+            JOIN Account a ON ca.account_id = a.account_id
+            WHERE a.account_name = $1;"#,
+            [user.unwrap().id().unwrap().into()],
+        ))
+        .all(&data.conn)
+        .await
+        .unwrap();
 
-    let connection = &mut establish_connection();
-    let results = conversation
-        .select(models::Conversation::as_select())
-        .load(connection)
-        .expect("Error loading conversations");
-
-    let conversation_info: Vec<ConversationInfo> = results
-        .iter()
-        .map(|conv| ConversationInfo {
-            id: conv.id,
-            name: conv.customer_name.to_owned(),
-            updated_at: conv.updated_at,
-            count_unread: 1,
-            last_message: None,
-        })
-        .collect();
-    */
-
-    Ok("TODO")
+    Ok(web::Json(conversations))
 }
 
 #[derive(Serialize)]
@@ -52,27 +54,18 @@ struct ConversationDetail {
 }
 
 #[get("/detail/{id}")]
-async fn get_chat_by_id(path: web::Path<String>) -> Result<impl Responder> {
-    /*
-    use crate::schema::conversation::dsl::*;
+async fn get_conversation_by_id(
+    path: web::Path<String>,
+    data: web::Data<AppState>,
+) -> Result<impl Responder> {
+    let conversation_id: i32 = path.into_inner().parse().unwrap();
 
-    let conv_id: i32 = path.into_inner().parse().unwrap();
-    let connection = &mut establish_connection();
-    let conv = conversation
-        .find(conv_id)
-        .first::<crate::models::Conversation>(connection)
-        .expect("failed to load accounts");
+    let conversation = Conversation::find_by_id(conversation_id)
+        .one(&data.conn)
+        .await
+        .unwrap();
 
-    let response = ConversationInfo {
-        id: conv.id,
-        name: conv.customer_name.to_owned(),
-        updated_at: conv.updated_at,
-        count_unread: 1,
-        last_message: None,
-    };
-    */
-
-    Ok("TODO")
+    Ok(web::Json(conversation))
 }
 
 #[get("/ws")]
@@ -95,4 +88,12 @@ async fn chat_route(
         &req,
         stream,
     )
+}
+
+pub fn init_service(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/conversation")
+            .service(get_conversation_by_id)
+            .service(get_conversations),
+    );
 }
