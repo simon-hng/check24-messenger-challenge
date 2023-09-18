@@ -10,8 +10,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub account_name: String,
-    #[sea_orm(column_type = "Binary(BlobSize::Blob(None))", nullable)]
-    pub picture: Option<Vec<u8>>,
+    pub picture: Option<String>,
     pub account_type: Option<AccountType>,
 }
 
