@@ -25,5 +25,14 @@ impl Related<super::message::Entity> for Entity {
         Relation::Message.def()
     }
 }
+impl Related<super::conversation::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::conversation_account::Relation::Conversation.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::conversation_account::Relation::Account.def().rev())
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

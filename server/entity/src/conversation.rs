@@ -16,4 +16,18 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
+impl Related<super::account::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::conversation_account::Relation::Account.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(
+            super::conversation_account::Relation::Conversation
+                .def()
+                .rev(),
+        )
+    }
+}
+
 impl ActiveModelBehavior for ActiveModel {}

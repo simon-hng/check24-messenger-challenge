@@ -21,15 +21,15 @@ pub enum Relation {
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Account2,
+    Account,
     #[sea_orm(
-        belongs_to = "super::account::Entity",
+        belongs_to = "super::conversation::Entity",
         from = "Column::ConversationId",
-        to = "super::account::Column::Id",
+        to = "super::conversation::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Account1,
+    Conversation,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

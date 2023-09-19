@@ -1,6 +1,9 @@
 use std::time::Instant;
 
-use ::entity::{conversation, prelude::Conversation};
+use ::entity::{
+    account, conversation,
+    prelude::{Account, Conversation},
+};
 use actix::*;
 use actix_identity::Identity;
 use actix_web::*;
@@ -28,20 +31,19 @@ async fn get_conversations(
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
     let user = user.expect("Not authenticated");
-    // TODO: This query does not work right now
-    let conversations: Vec<conversation::Model> = Conversation::find()
-        .from_raw_sql(Statement::from_sql_and_values(
-            DbBackend::Postgres,
-            r#"SELECT c.*
-            FROM Conversation c
-            JOIN Conversation_Account ca ON c.id = ca.conversation_id
-            JOIN Account a ON ca.account_id = a.id
-            WHERE a.account_name LIKE '%$1%';"#,
-            [user.id().expect("id should not be unset").into()],
-        ))
+    let account = Account::find()
+        .filter(account::Column::AccountName.eq(user.id().expect("Id should be set")))
+        .one(&data.conn)
+        .await
+        .unwrap()
+        .unwrap();
+    // TODO: This panics if no conversations are found. Return 204 - No Content instead
+
+    let conversations = account
+        .find_related(Conversation)
         .all(&data.conn)
         .await
-        .unwrap_or_default();
+        .unwrap();
 
     Ok(web::Json(conversations))
 }
