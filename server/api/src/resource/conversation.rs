@@ -27,19 +27,21 @@ async fn get_conversations(
     user: Option<Identity>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
+    let user = user.expect("Not authenticated");
+    // TODO: This query does not work right now
     let conversations: Vec<conversation::Model> = Conversation::find()
         .from_raw_sql(Statement::from_sql_and_values(
             DbBackend::Postgres,
             r#"SELECT c.*
             FROM Conversation c
-            JOIN Conversation_Account ca ON c.conversation_id = ca.conversation_id
-            JOIN Account a ON ca.account_id = a.account_id
-            WHERE a.account_name = $1;"#,
-            [user.unwrap().id().unwrap().into()],
+            JOIN Conversation_Account ca ON c.id = ca.conversation_id
+            JOIN Account a ON ca.account_id = a.id
+            WHERE a.account_name LIKE '%$1%';"#,
+            [user.id().expect("id should not be unset").into()],
         ))
         .all(&data.conn)
         .await
-        .unwrap();
+        .unwrap_or_default();
 
     Ok(web::Json(conversations))
 }
