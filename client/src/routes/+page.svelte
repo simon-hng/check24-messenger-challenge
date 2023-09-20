@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import axios from 'axios';
 	import { createForm } from 'svelte-forms-lib';
 
@@ -6,9 +7,20 @@
 		initialValues: {
 			username: ''
 		},
-		onSubmit: (values) => {
-			axios.post(`account/login/${encodeURIComponent(values.username)}`);
+		onSubmit: async (values) => {
+			await axios
+				.post(`auth/login/${encodeURIComponent(values.username)}`)
+				.then((data) => console.log(data));
+
+			queryClient.invalidateQueries(['whoami']);
 		}
+	});
+
+	const queryClient = useQueryClient();
+
+	const whoamiQuery = createQuery<string, Error>({
+		queryKey: ['whoami'],
+		queryFn: async () => await axios.get('auth/whoami').then((res) => res.data)
 	});
 </script>
 
@@ -22,10 +34,21 @@
 		Aller Anfang ist schwer. Anfangen ist einfach, Beharrlichkeit eine Kunst
 	</h1>
 
-	<form class="space-y-2 m-8">
+	{#if $whoamiQuery.isSuccess}
+		<h2 class="text-center">
+			{$whoamiQuery.data}
+		</h2>
+	{/if}
+
+	<form class="space-y-2 m-8" on:submit={handleSubmit}>
 		<label>
 			Username
-			<input class="input py-2 px-4 mt-2" placeholder="simonhng" />
+			<input
+				class="input py-2 px-4 mt-2"
+				placeholder="simonhng"
+				on:change={handleChange}
+				bind:value={$form.username}
+			/>
 		</label>
 
 		<button type="submit" class="btn variant-filled w-full">login</button>

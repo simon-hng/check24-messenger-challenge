@@ -5,6 +5,8 @@
 	import { QueryClientProvider, QueryClient } from '@tanstack/svelte-query';
 
 	axios.defaults.baseURL = 'http://localhost:8080';
+	axios.defaults.withCredentials = true;
+
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {

@@ -46,7 +46,11 @@ pub async fn main() -> std::io::Result<()> {
                 CookieSessionStore::default(),
                 secret_key.clone(),
             ))
-            .wrap(Cors::default().allowed_origin("http://localhost:5173"))
+            .wrap(
+                Cors::default()
+                    .allowed_origin("http://localhost:5173")
+                    .supports_credentials(),
+            )
             .configure(auth::init_service)
             .configure(conversation::init_service)
     })
