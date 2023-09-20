@@ -4,21 +4,6 @@ use sea_orm::EntityTrait;
 
 use crate::AppState;
 
-#[get("/{id}")]
-pub async fn get_account_by_id(path: web::Path<String>) -> Result<impl Responder> {
-    /*
-    use crate::schema::account::dsl::*;
-
-    let account_id: i32 = path.into_inner().parse().unwrap();
-    let connection = &mut establish_connection();
-    let results = account
-        .find(account_id)
-        .first::<crate::models::Account>(connection)
-        .expect("failed to load accounts");
-    */
-    Ok("TODO")
-}
-
 #[get("/")]
 pub async fn list_accounts(data: web::Data<AppState>) -> Result<impl Responder> {
     let conn = &data.conn;

@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use ::entity::{
-    account, conversation,
+    account,
     prelude::{Account, Conversation},
 };
 use actix::*;
