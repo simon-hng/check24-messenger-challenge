@@ -1,3 +1,4 @@
+use actix::Actor;
 use actix_cors::Cors;
 use actix_identity::IdentityMiddleware;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
@@ -8,7 +9,7 @@ use sea_orm::{Database, DatabaseConnection};
 use std::env;
 
 mod resource;
-use resource::*;
+use resource::{server::ChatServer, *};
 
 #[derive(Debug, Clone)]
 pub struct AppState {
@@ -34,12 +35,12 @@ pub async fn main() -> std::io::Result<()> {
     // keep a count of the number of visitors
     let app_state = AppState { conn };
 
-    // let server = api::handler::server::ChatServer::new(app_state.clone()).start();
+    let server = ChatServer::new().start();
 
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
-            // .app_data(web::Data::new(server.clone()))
+            .app_data(web::Data::new(server.clone()))
             .wrap(middleware::Logger::default())
             .wrap(IdentityMiddleware::default())
             .wrap(SessionMiddleware::new(

@@ -53,18 +53,16 @@ pub struct Join {
 }
 
 /// `ChatServer` manages chat rooms and responsible for coordinating chat session.
-///
 /// Implementation is very naïve.
 #[derive(Debug)]
 pub struct ChatServer {
     sessions: HashMap<usize, Recipient<Message>>,
     rooms: HashMap<String, HashSet<usize>>,
     rng: ThreadRng,
-    visitor_count: Arc<AtomicUsize>,
 }
 
 impl ChatServer {
-    pub fn new(visitor_count: Arc<AtomicUsize>) -> ChatServer {
+    pub fn new() -> ChatServer {
         // default room
         let mut rooms = HashMap::new();
         rooms.insert("main".to_owned(), HashSet::new());
@@ -73,7 +71,6 @@ impl ChatServer {
             sessions: HashMap::new(),
             rooms,
             rng: rand::thread_rng(),
-            visitor_count,
         }
     }
 }
@@ -118,9 +115,6 @@ impl Handler<Connect> for ChatServer {
 
         // auto join session to main room
         self.rooms.entry("main".to_owned()).or_default().insert(id);
-
-        let count = self.visitor_count.fetch_add(1, Ordering::SeqCst);
-        self.send_message("main", &format!("Total visitors {count}"), 0);
 
         // send id back
         id
