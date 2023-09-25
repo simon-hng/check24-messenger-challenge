@@ -10,6 +10,12 @@ pub struct WsChatSession {
     pub session: Session,
 }
 
+struct WhoAmI;
+
+impl Message for WhoAmI {
+    type Result = Result<actix::Addr<WsChatSession>, ()>;
+}
+
 impl Actor for WsChatSession {
     type Context = ws::WebsocketContext<Self>;
 
@@ -21,12 +27,20 @@ impl Actor for WsChatSession {
         // HttpContext::state() is instance of WsChatSessionState, state is shared
         // across all routes within application
         let addr = ctx.address();
-        self.session.insert("socket", "asd");
+        let recipient = addr.recipient();
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
         self.session.remove("socket");
         Running::Stop
+    }
+}
+
+impl Handler<WhoAmI> for WsChatSession {
+    type Result = Result<actix::Addr<WsChatSession>, ()>;
+
+    fn handle(&mut self, msg: WhoAmI, ctx: &mut Self::Context) -> Self::Result {
+        Ok(ctx.address())
     }
 }
 
