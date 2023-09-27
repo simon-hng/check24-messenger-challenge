@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use actix::prelude::*;
-use actix_identity::Identity;
 use entity::sea_orm_active_enums::MessageType;
+use serde::Deserialize;
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Message(pub String);
 
-#[derive(Message)]
+#[derive(Message, Deserialize)]
 #[rtype(result = "()")]
 pub struct ClientMessage {
     pub message_type: Option<MessageType>,
@@ -19,16 +19,16 @@ pub struct ClientMessage {
 }
 
 #[derive(Message)]
-#[rtype(String)]
+#[rtype(result = "()")]
 pub struct Connect {
-    pub identity: Identity,
+    pub id: String,
     pub addr: Recipient<Message>,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub identity: Identity,
+    pub id: String,
 }
 
 #[derive(Debug)]
@@ -49,13 +49,10 @@ impl Actor for MessageServer {
 }
 
 impl Handler<Connect> for MessageServer {
-    type Result = String;
+    type Result = ();
 
     fn handle(&mut self, msg: Connect, ctx: &mut Self::Context) -> Self::Result {
-        let id = msg.identity.id().expect("Not logged in");
-        self.sessions.insert(id, msg.addr);
-
-        id
+        self.sessions.insert(msg.id, msg.addr);
     }
 }
 
@@ -63,8 +60,7 @@ impl Handler<Disconnect> for MessageServer {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, ctx: &mut Self::Context) -> Self::Result {
-        let id = msg.identity.id().expect("Not logged in");
-        self.sessions.remove(&id);
+        self.sessions.remove(&msg.id);
     }
 }
 

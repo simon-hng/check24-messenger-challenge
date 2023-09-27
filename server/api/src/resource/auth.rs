@@ -33,8 +33,10 @@ async fn login(
 
     // TODO: Error handling. This needs to throw an error that is mapped to 404 not found
 
-    let _ = Identity::login(&request.extensions(), account.id.to_string());
-    HttpResponse::Ok()
+    let account_id = account.id.to_string();
+
+    let _ = Identity::login(&request.extensions(), account_id.to_owned());
+    HttpResponse::Ok().body(account_id)
 }
 
 #[post("/logout")]

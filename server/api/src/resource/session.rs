@@ -1,46 +1,45 @@
 use std::time::Instant;
 
 use actix::prelude::*;
-use actix_session::Session;
+use actix_identity::Identity;
 use actix_web_actors::ws;
+use serde::Deserialize;
+
+use crate::resource::server::Connect;
+
+use super::server;
 
 pub struct WsChatSession {
-    pub id: usize,
     pub heart_beat: Instant,
-    pub session: Session,
-}
-
-struct WhoAmI;
-
-impl Message for WhoAmI {
-    type Result = Result<actix::Addr<WsChatSession>, ()>;
+    pub addr: Addr<server::MessageServer>,
 }
 
 impl Actor for WsChatSession {
     type Context = ws::WebsocketContext<Self>;
 
-    /// We register ws session with ChatServer
+    /*
+     * TODO: Move this to message handler
     fn started(&mut self, ctx: &mut Self::Context) {
-        // register self in chat server. `AsyncContext::wait` register
-        // future within context, but context waits until this future resolves
-        // before processing any other events.
-        // HttpContext::state() is instance of WsChatSessionState, state is shared
-        // across all routes within application
         let addr = ctx.address();
-        let recipient = addr.recipient();
+
+        self.addr.send(server::Connect {
+            id,
+            addr: addr.recipient(),
+        });
     }
+    */
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        self.session.remove("socket");
         Running::Stop
     }
 }
 
-impl Handler<WhoAmI> for WsChatSession {
-    type Result = Result<actix::Addr<WsChatSession>, ()>;
+// Takes message from the server and forwards it to the client
+impl Handler<server::Message> for WsChatSession {
+    type Result = ();
 
-    fn handle(&mut self, msg: WhoAmI, ctx: &mut Self::Context) -> Self::Result {
-        Ok(ctx.address())
+    fn handle(&mut self, msg: server::Message, ctx: &mut Self::Context) {
+        ctx.text(msg.0);
     }
 }
 
@@ -56,5 +55,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
         };
 
         log::debug!("WEBSOCKET MESSAGE: {msg:?}");
+        match msg {
+            ws::Message::Text(msg) => {
+                let addr = ctx.address();
+                self.addr.send(server::Connect {
+                    id: msg.to_string(),
+                    addr: addr.recipient(),
+                });
+            }
+            ws::Message::Binary(_) => todo!(),
+            ws::Message::Continuation(_) => todo!(),
+            ws::Message::Ping(_) => todo!(),
+            ws::Message::Pong(_) => todo!(),
+            ws::Message::Close(_) => todo!(),
+            ws::Message::Nop => todo!(),
+        }
     }
 }

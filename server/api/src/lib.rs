@@ -1,10 +1,11 @@
+use actix::Actor;
 use actix_cors::Cors;
 use actix_identity::IdentityMiddleware;
 use actix_session::{storage::RedisSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware, web, App, HttpServer};
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
-use resource::{auth, conversation, message};
+use resource::{auth, conversation, message, server};
 use sea_orm::{Database, DatabaseConnection};
 use std::env;
 
@@ -36,6 +37,8 @@ pub async fn main() -> std::io::Result<()> {
     // keep a count of the number of visitors
     let app_state = AppState { conn };
 
+    let messageServer = server::MessageServer::new().start();
+
     let store = RedisSessionStore::new(redis_connection_string)
         .await
         .expect("Failed to connect to redis");
@@ -43,6 +46,7 @@ pub async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
+            .app_data(web::Data::new(messageServer.clone()))
             .wrap(middleware::Logger::default())
             .wrap(IdentityMiddleware::default())
             .wrap(SessionMiddleware::new(store.clone(), secret_key.clone()))

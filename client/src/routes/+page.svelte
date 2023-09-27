@@ -7,12 +7,17 @@
 		initialValues: {
 			username: ''
 		},
+
 		onSubmit: async (values) => {
-			await axios
-				.post(`auth/login/${encodeURIComponent(values.username)}`)
-				.then((data) => console.log(data));
+			let account_id = await axios.post(`auth/login/${encodeURIComponent(values.username)}`);
 
 			queryClient.invalidateQueries(['whoami']);
+
+			let socket: WebSocket;
+			socket = new WebSocket('ws://localhost:8080/message/receive');
+			socket.onopen = () => {
+				socket.send(JSON.stringify(account_id));
+			};
 		}
 	});
 
