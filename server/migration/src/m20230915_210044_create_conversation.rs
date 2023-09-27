@@ -54,6 +54,7 @@ pub enum Message {
     MessageType,
     ReadAt,
     CreatedAt,
+    RecipientId,
     SenderId,
     ConversationId,
 }
@@ -174,13 +175,22 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_date())
                             .not_null(),
                     )
+                    .col(ColumnDef::new(Message::RecipientId).integer())
                     .col(ColumnDef::new(Message::SenderId).integer())
                     .col(ColumnDef::new(Message::ConversationId).integer())
                     .foreign_key(
                         ForeignKey::create()
+                            .name("recipient_id")
+                            .from(Message::Table, Message::RecipientId)
+                            .to(Account::Table, Account::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
                             .name("sender_id")
                             .from(Message::Table, Message::SenderId)
-                            .to(Message::Table, Message::Id)
+                            .to(Account::Table, Account::Id)
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade),
                     )
@@ -188,7 +198,7 @@ impl MigrationTrait for Migration {
                         ForeignKey::create()
                             .name("conversation_id")
                             .from(Message::Table, Message::ConversationId)
-                            .to(Account::Table, Account::Id)
+                            .to(Conversation::Table, Conversation::Id)
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade),
                     )

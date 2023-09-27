@@ -50,7 +50,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Account::Name).string().not_null())
-                    .col(ColumnDef::new(Account::Picture).binary())
+                    .col(ColumnDef::new(Account::Picture).string())
                     .col(
                         ColumnDef::new(Account::AccountType)
                             .enumeration(AccountType::Table, AccountType::iter().skip(1)),
