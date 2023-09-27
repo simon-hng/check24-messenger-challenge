@@ -2,9 +2,9 @@
 
 use super::sea_orm_active_enums::MessageType;
 use sea_orm::entity::prelude::*;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "message")]
 pub struct Model {
     #[sea_orm(primary_key)]
@@ -13,6 +13,7 @@ pub struct Model {
     pub text: String,
     pub read_at: Option<DateTime>,
     pub created_at: DateTime,
+    pub recipient_id: Option<i32>,
     pub sender_id: Option<i32>,
     pub conversation_id: Option<i32>,
 }
@@ -21,25 +22,33 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::account::Entity",
-        from = "Column::ConversationId",
+        from = "Column::RecipientId",
         to = "super::account::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Account,
+    Account2,
     #[sea_orm(
-        belongs_to = "Entity",
+        belongs_to = "super::account::Entity",
         from = "Column::SenderId",
-        to = "Column::Id",
+        to = "super::account::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    SelfRef,
+    Account1,
+    #[sea_orm(
+        belongs_to = "super::conversation::Entity",
+        from = "Column::ConversationId",
+        to = "super::conversation::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Conversation,
 }
 
-impl Related<super::account::Entity> for Entity {
+impl Related<super::conversation::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Account.def()
+        Relation::Conversation.def()
     }
 }
 

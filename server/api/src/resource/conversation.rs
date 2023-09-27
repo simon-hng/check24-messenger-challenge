@@ -25,7 +25,7 @@ async fn get_conversations(
 ) -> Result<impl Responder> {
     let user = user.expect("Not authenticated");
     let account = Account::find()
-        .filter(account::Column::AccountName.eq(user.id().expect("Id should be set")))
+        .filter(account::Column::Name.eq(user.id().expect("Id should be set")))
         .one(&data.conn)
         .await
         .unwrap()

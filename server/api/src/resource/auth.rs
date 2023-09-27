@@ -25,7 +25,7 @@ async fn login(
     let account_name: String = path.into_inner().parse().unwrap();
 
     let account = Account::find()
-        .filter(account::Column::AccountName.eq(&account_name))
+        .filter(account::Column::Name.eq(&account_name))
         .one(&data.conn)
         .await
         .unwrap()
