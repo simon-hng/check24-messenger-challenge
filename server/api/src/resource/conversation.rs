@@ -3,8 +3,8 @@ use ::entity::{
     prelude::{Account, Conversation},
 };
 use actix_identity::Identity;
-use actix_web::*;
-use sea_orm::*;
+use actix_web::{error, get, web, Responder, Result};
+use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use serde::Serialize;
 
 use crate::AppState;
@@ -28,9 +28,11 @@ async fn get_conversations(
         .filter(account::Column::Name.eq(user.id().expect("Id should be set")))
         .one(&data.conn)
         .await
-        .unwrap()
-        .unwrap();
-    // TODO: This panics if no conversations are found. Return 204 - No Content instead
+        .map_err(|err| error::ErrorServiceUnavailable(err))?;
+
+    let account = account
+        .ok_or("Failed to find associated account")
+        .map_err(|err| error::ErrorNotFound(err))?;
 
     let conversations = account
         .find_related(Conversation)
