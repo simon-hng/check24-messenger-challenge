@@ -36,17 +36,18 @@ pub async fn main() -> std::io::Result<()> {
     // set up applications state
     // keep a count of the number of visitors
     let app_state = AppState { conn };
-
-    let messageServer = server::MessageServer::new().start();
+    let message_server = server::MessageServer::new().start();
 
     let store = RedisSessionStore::new(redis_connection_string)
         .await
         .expect("Failed to connect to redis");
 
+    log::info!("starting HTTP server at http://localhost:8080");
+
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
-            .app_data(web::Data::new(messageServer.clone()))
+            .app_data(web::Data::new(message_server.clone()))
             .wrap(middleware::Logger::default())
             .wrap(IdentityMiddleware::default())
             .wrap(SessionMiddleware::new(store.clone(), secret_key.clone()))

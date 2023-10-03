@@ -19,13 +19,14 @@ struct ConversationInfo {
 }
 
 #[get("/")]
-async fn get_conversations(
-    user: Option<Identity>,
-    data: web::Data<AppState>,
-) -> Result<impl Responder> {
-    let user = user.expect("Not authenticated");
-    let account = Account::find()
-        .filter(account::Column::Name.eq(user.id().expect("Id should be set")))
+async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<impl Responder> {
+    let user_id: i32 = user
+        .id()
+        .map_err(|err| error::ErrorUnauthorized(err))?
+        .parse()
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+
+    let account = Account::find_by_id(user_id)
         .one(&data.conn)
         .await
         .map_err(|err| error::ErrorServiceUnavailable(err))?;
@@ -38,7 +39,7 @@ async fn get_conversations(
         .find_related(Conversation)
         .all(&data.conn)
         .await
-        .unwrap();
+        .unwrap_or(Vec::new());
 
     Ok(web::Json(conversations))
 }

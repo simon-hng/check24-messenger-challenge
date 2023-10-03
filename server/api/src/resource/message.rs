@@ -4,6 +4,8 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
+use entity::{message, prelude::Message};
+use sea_orm::{ActiveValue, EntityTrait};
 
 use crate::resource::{
     server::{self, ClientMessage},
@@ -25,19 +27,8 @@ async fn post_message(
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
 
-    let _ = server.send(msg);
+    server.send(msg.clone()).await;
 
-    //     let message = message::ActiveModel {
-    //         message_type: ActiveValue::Set(message.message_type.clone()),
-    //         conversation_id: ActiveValue::Set(message.conversation_id),
-    //         recipient_id: ActiveValue::Set(message.recipient_id),
-    //         sender_id: ActiveValue::Set(user_id),
-    //         text: ActiveValue::Set(message.text.to_owned()),
-    //         ..Default::default()
-    //     };
-    //
-    //     Message::insert(message);
-    //
     Ok("ok")
 }
 
