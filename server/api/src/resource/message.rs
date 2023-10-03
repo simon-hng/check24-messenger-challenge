@@ -4,27 +4,40 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
-use serde::Deserialize;
 
-use super::{server, session};
-
-#[derive(Deserialize)]
-struct Message {
-    text: String,
-}
+use crate::resource::{
+    server::{self, ClientMessage},
+    session,
+};
 
 #[post("/")]
-async fn post_message(message: web::Json<Message>) -> Result<impl Responder> {
-    Ok(format!("Sent message {}!", message.text))
-}
-
-#[post("/send")]
-async fn send_message(
+async fn post_message(
     server: web::Data<Addr<server::MessageServer>>,
-    json: web::Json<server::ClientMessage>,
+    message: web::Json<ClientMessage>,
+    user: Option<Identity>,
 ) -> Result<impl Responder> {
-    server.send(json.into_inner());
+    let user = user
+        .ok_or("Not Authenticated")
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id: Option<i32> = user_id.parse().ok();
 
+    let mut msg = message.into_inner();
+    msg.sender_id = user_id;
+
+    let _ = server.send(msg);
+
+    //     let message = message::ActiveModel {
+    //         message_type: ActiveValue::Set(message.message_type.clone()),
+    //         conversation_id: ActiveValue::Set(message.conversation_id),
+    //         recipient_id: ActiveValue::Set(message.recipient_id),
+    //         sender_id: ActiveValue::Set(user_id),
+    //         text: ActiveValue::Set(message.text.to_owned()),
+    //         ..Default::default()
+    //     };
+    //
+    //     Message::insert(message);
+    //
     Ok("ok")
 }
 

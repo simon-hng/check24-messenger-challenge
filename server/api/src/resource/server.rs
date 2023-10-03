@@ -8,7 +8,7 @@ use serde::Deserialize;
 #[rtype(result = "()")]
 pub struct Message(pub String);
 
-#[derive(Message, Deserialize)]
+#[derive(Debug, Message, Deserialize)]
 #[rtype(result = "()")]
 pub struct ClientMessage {
     pub message_type: Option<MessageType>,
@@ -70,6 +70,10 @@ impl Handler<ClientMessage> for MessageServer {
     fn handle(&mut self, msg: ClientMessage, ctx: &mut Self::Context) -> Self::Result {
         let recipient = self
             .sessions
-            .get(&msg.recipient_id.expect("should not happen").to_string());
+            .get(&msg.recipient_id.expect("should not happen").to_string())
+            .ok_or("Recipient not found")
+            .expect("TODO return error");
+
+        print!("{:?}", msg)
     }
 }

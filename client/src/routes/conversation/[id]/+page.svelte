@@ -4,6 +4,7 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
+	import axios from 'axios';
 
 	let currentMessage = '';
 	let messages: any[] = [];
@@ -25,7 +26,9 @@
 	});
 
 	const sendHandler = () => {
-		socket.send(currentMessage);
+		axios.post('/message/', {
+			data: { text: currentMessage }
+		});
 		messages = [...messages, currentMessage];
 		currentMessage = '';
 	};
