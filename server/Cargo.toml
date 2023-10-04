@@ -8,6 +8,12 @@ members = [".", "api", "migration", "entity", "service"]
 
 [workspace.dependencies]
 serde = { version = "1.0.188", features = ["derive"] }
+sea-orm = { version = "0.12.2", features = [
+  "runtime-actix",
+  "sqlx-postgres",
+  "runtime-tokio-rustls",
+  "with-json",
+] }
 
 [dependencies]
 api = { path = "api" }

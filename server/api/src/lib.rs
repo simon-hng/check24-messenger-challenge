@@ -36,7 +36,7 @@ pub async fn main() -> std::io::Result<()> {
     // set up applications state
     // keep a count of the number of visitors
     let app_state = AppState { conn };
-    let message_server = server::MessageServer::new().start();
+    let message_server = server::MessageServer::new(app_state.clone()).start();
 
     let store = RedisSessionStore::new(redis_connection_string)
         .await

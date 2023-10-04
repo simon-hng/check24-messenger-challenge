@@ -27,7 +27,18 @@ async fn post_message(
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
 
-    server.send(msg.clone()).await;
+    let _ = server.send(msg).await;
+
+    let message = message::ActiveModel {
+        message_type: ActiveValue::Set(message.message_type.clone()),
+        conversation_id: ActiveValue::Set(message.conversation_id),
+        recipient_id: ActiveValue::Set(message.recipient_id),
+        sender_id: ActiveValue::Set(user_id),
+        text: ActiveValue::Set(message.text.to_owned()),
+        ..Default::default()
+    };
+
+    Message::insert(message);
 
     Ok("ok")
 }

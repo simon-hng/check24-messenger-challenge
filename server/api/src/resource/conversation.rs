@@ -1,11 +1,7 @@
-use ::entity::{
-    account,
-    prelude::{Account, Conversation},
-};
 use actix_identity::Identity;
 use actix_web::{error, get, web, Responder, Result};
-use sea_orm::{ColumnTrait, EntityTrait, ModelTrait, QueryFilter};
 use serde::Serialize;
+use service::Query;
 
 use crate::AppState;
 
@@ -26,20 +22,13 @@ async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<
         .parse()
         .map_err(|err| error::ErrorUnauthorized(err))?;
 
-    let account = Account::find_by_id(user_id)
-        .one(&data.conn)
+    let conversations = Query::find_conversation_by_account_id(&data.conn, user_id)
         .await
-        .map_err(|err| error::ErrorServiceUnavailable(err))?;
-
-    let account = account
-        .ok_or("Failed to find associated account")
-        .map_err(|err| error::ErrorNotFound(err))?;
-
-    let conversations = account
-        .find_related(Conversation)
-        .all(&data.conn)
-        .await
-        .unwrap_or(Vec::new());
+        .map_err(|err| match err {
+            sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
+            sea_orm::DbErr::RecordNotFound(message) => error::ErrorNotFound(message),
+            _ => error::ErrorInternalServerError(""),
+        })?;
 
     Ok(web::Json(conversations))
 }
@@ -60,10 +49,13 @@ async fn get_conversation_by_id(
 ) -> Result<impl Responder> {
     let conversation_id: i32 = path.into_inner().parse().unwrap();
 
-    let conversation = Conversation::find_by_id(conversation_id)
-        .one(&data.conn)
+    let conversation = Query::find_conversation_by_id(&data.conn, conversation_id)
         .await
-        .unwrap();
+        .map_err(|err| match err {
+            sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
+            sea_orm::DbErr::RecordNotFound(message) => error::ErrorNotFound(message),
+            _ => error::ErrorInternalServerError(""),
+        })?;
 
     Ok(web::Json(conversation))
 }

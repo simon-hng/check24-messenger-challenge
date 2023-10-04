@@ -2,7 +2,10 @@ use std::collections::HashMap;
 
 use actix::prelude::*;
 use entity::sea_orm_active_enums::MessageType;
+use sea_orm::DatabaseConnection;
 use serde::Deserialize;
+
+use crate::AppState;
 
 #[derive(Message)]
 #[rtype(result = "()")]
@@ -33,12 +36,14 @@ pub struct Disconnect {
 
 #[derive(Debug)]
 pub struct MessageServer {
+    db_connection: DatabaseConnection,
     sessions: HashMap<String, Recipient<Message>>,
 }
 
 impl MessageServer {
-    pub fn new() -> MessageServer {
+    pub fn new(app_state: AppState) -> MessageServer {
         MessageServer {
+            db_connection: app_state.conn,
             sessions: HashMap::new(),
         }
     }

@@ -2756,6 +2756,10 @@ dependencies = [
 [[package]]
 name = "service"
 version = "0.1.0"
+dependencies = [
+ "entity",
+ "sea-orm",
+]
 
 [[package]]
 name = "sha1"
