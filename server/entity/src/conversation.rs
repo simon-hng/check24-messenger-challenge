@@ -4,6 +4,10 @@ use super::sea_orm_active_enums::ConversationState;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+pub struct CreateConversation {
+
+}
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "conversation")]
 pub struct Model {

@@ -7,12 +7,12 @@ use actix_web_actors::ws;
 use sea_orm::TryIntoModel;
 use entity::app::AppState;
 use service::{Mutation, server, session};
-use service::server::ClientMessage;
+use service::server::CreateMessage;
 
 #[post("/")]
 async fn post_message(
     server: web::Data<Addr<server::MessageServer>>,
-    message: web::Json<ClientMessage>,
+    message: web::Json<CreateMessage>,
     user: Option<Identity>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {

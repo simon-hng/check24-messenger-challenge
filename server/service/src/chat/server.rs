@@ -12,7 +12,7 @@ pub struct ServerMessage(pub String);
 
 #[derive(Debug, Message, Deserialize, Clone)]
 #[rtype(result = "()")]
-pub struct ClientMessage {
+pub struct CreateMessage {
     pub message_type: Option<MessageType>,
     pub text: String,
     pub sender_id: Option<i32>,
@@ -68,10 +68,10 @@ impl Handler<Disconnect> for MessageServer {
     }
 }
 
-impl Handler<ClientMessage> for MessageServer {
+impl Handler<CreateMessage> for MessageServer {
     type Result = ();
 
-    fn handle(&mut self, msg: ClientMessage, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: CreateMessage, _ctx: &mut Self::Context) -> Self::Result {
         log::info!("Received a chat message");
         let _recipient = self
             .sessions

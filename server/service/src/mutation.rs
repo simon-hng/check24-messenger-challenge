@@ -1,13 +1,26 @@
-use entity::message;
-use sea_orm::{ActiveModelTrait, DbConn, DbErr, Set};
-use crate::server::ClientMessage;
+use actix_web::web::Json;
+use entity::{conversation, message};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, DbConn, DbErr, Set};
+use entity::conversation::CreateConversation;
+use entity::message::Relation::Conversation;
+use crate::server::CreateMessage;
 
 pub struct Mutation;
 
 impl Mutation {
+    pub async fn create_conversation(db: &DatabaseConnection, conversation: Json<CreateConversation>) ->
+    Result<conversation::ActiveModel, DbErr>
+    {
+        conversation::ActiveModel {
+            ..Default::default()
+        }.save(db).await
+    }
+}
+
+impl Mutation {
     pub async fn create_message(
         db: &DbConn,
-        message: ClientMessage,
+        message: CreateMessage,
     ) -> Result<message::ActiveModel, DbErr> {
         message::ActiveModel {
             message_type: Set(message.message_type.to_owned()),
@@ -16,8 +29,6 @@ impl Mutation {
             sender_id: Set(message.sender_id.to_owned()),
             text: Set(message.text.to_owned()),
             ..Default::default()
-        }
-        .save(db)
-        .await
+        }.save(db).await
     }
 }

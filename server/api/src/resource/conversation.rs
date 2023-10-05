@@ -1,7 +1,9 @@
 use actix_identity::Identity;
-use actix_web::{error, get, web, Responder, Result};
+use actix_web::*;
+use sea_orm::TryIntoModel;
 use serde::Serialize;
-use service::Query;
+use entity::conversation::CreateConversation;
+use service::{Mutation, Query};
 
 use crate::AppState;
 
@@ -12,6 +14,16 @@ struct ConversationInfo {
     last_message: Option<String>,
     updated_at: chrono::NaiveDateTime,
     count_unread: i32,
+}
+
+#[post("/")]
+async fn create_conversation(user: Identity, data: web::Data<AppState>, conversation: web::Json<CreateConversation>) -> Result<impl Responder> {
+    let db_conversation = Mutation::create_conversation(&data.conn, conversation)
+        .await
+        .map(|db_conversation| db_conversation.try_into_model().unwrap()).map_err(|err| error::ErrorInternalServerError(err))?;
+
+    // TODO: Return db_conversation
+    Ok(HttpResponse::Created().body("TODO"))
 }
 
 #[get("/")]
@@ -64,6 +76,7 @@ pub fn init_service(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/conversation")
             .service(get_conversation_by_id)
-            .service(get_conversations),
+            .service(get_conversations)
+            .service(create_conversation),
     );
 }
