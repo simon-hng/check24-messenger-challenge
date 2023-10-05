@@ -4,8 +4,6 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
-use entity::{message, prelude::Message};
-use sea_orm::{ActiveValue, EntityTrait};
 
 use crate::resource::{
     server::{self, ClientMessage},
@@ -26,21 +24,13 @@ async fn post_message(
 
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
+    let result = server
+        .send(msg)
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    let _ = server.send(msg).await;
-
-    let message = message::ActiveModel {
-        message_type: ActiveValue::Set(message.message_type.clone()),
-        conversation_id: ActiveValue::Set(message.conversation_id),
-        recipient_id: ActiveValue::Set(message.recipient_id),
-        sender_id: ActiveValue::Set(user_id),
-        text: ActiveValue::Set(message.text.to_owned()),
-        ..Default::default()
-    };
-
-    Message::insert(message);
-
-    Ok("ok")
+    // TODO: This should return the newly created resource
+    Ok(HttpResponse::Created().body("data"))
 }
 
 #[get("/receive")]

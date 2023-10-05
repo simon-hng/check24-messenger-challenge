@@ -35,10 +35,10 @@ impl Actor for WsChatSession {
 }
 
 // Takes message from the server and forwards it to the client
-impl Handler<server::Message> for WsChatSession {
+impl Handler<server::ServerMessage> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: server::Message, ctx: &mut Self::Context) {
+    fn handle(&mut self, msg: server::ServerMessage, ctx: &mut Self::Context) {
         ctx.text(msg.0);
     }
 }
