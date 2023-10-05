@@ -5,16 +5,13 @@ use actix_session::{storage::RedisSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware, web, App, HttpServer};
 use dotenvy::dotenv;
 use migration::{Migrator, MigratorTrait};
-use resource::{auth, conversation, message, server};
-use sea_orm::{Database, DatabaseConnection};
+use resource::{auth, conversation, message};
+use sea_orm::{Database};
 use std::env;
+use entity::app::AppState;
+use service::server;
 
 mod resource;
-
-#[derive(Debug, Clone)]
-pub struct AppState {
-    conn: DatabaseConnection,
-}
 
 #[actix_web::main]
 pub async fn main() -> std::io::Result<()> {
@@ -60,7 +57,7 @@ pub async fn main() -> std::io::Result<()> {
             .configure(conversation::init_service)
             .configure(message::init_service)
     })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }

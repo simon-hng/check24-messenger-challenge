@@ -4,11 +4,8 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
-
-use crate::resource::{
-    server::{self, ClientMessage},
-    session,
-};
+use service::{server, session};
+use service::server::ClientMessage;
 
 #[post("/")]
 async fn post_message(

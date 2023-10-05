@@ -2757,8 +2757,18 @@ dependencies = [
 name = "service"
 version = "0.1.0"
 dependencies = [
+ "actix",
+ "actix-cors",
+ "actix-identity",
+ "actix-session",
+ "actix-web",
+ "actix-web-actors",
+ "chrono",
  "entity",
+ "log",
  "sea-orm",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

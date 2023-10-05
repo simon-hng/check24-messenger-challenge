@@ -1,6 +1,6 @@
 use entity::message;
-use api::
 use sea_orm::{ActiveModelTrait, DbConn, DbErr, Set};
+use crate::server::ClientMessage;
 
 pub struct Mutation;
 
