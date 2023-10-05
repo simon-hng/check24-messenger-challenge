@@ -4,7 +4,9 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
-use service::{server, session};
+use sea_orm::TryIntoModel;
+use entity::app::AppState;
+use service::{Mutation, server, session};
 use service::server::ClientMessage;
 
 #[post("/")]
@@ -12,6 +14,7 @@ async fn post_message(
     server: web::Data<Addr<server::MessageServer>>,
     message: web::Json<ClientMessage>,
     user: Option<Identity>,
+    data: web::Data<AppState>,
 ) -> Result<impl Responder> {
     let user = user
         .ok_or("Not Authenticated")
@@ -22,12 +25,17 @@ async fn post_message(
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
     let result = server
-        .send(msg)
+        .send(msg.to_owned())
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    // TODO: This should return the newly created resource
-    Ok(HttpResponse::Created().body("data"))
+    let db_msg = Mutation::create_message(&data.conn, msg)
+        .await
+        .map(|db_message| db_message.try_into_model().expect("TODO"))
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    // TODO: Return db_msg
+    Ok(HttpResponse::Created().body("TODO"))
 }
 
 #[get("/receive")]

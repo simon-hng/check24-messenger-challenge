@@ -7,3 +7,5 @@ app/node_modules
 
 # Example dataset
 check24-messenger-challenge-datasets
+
+.idea/
