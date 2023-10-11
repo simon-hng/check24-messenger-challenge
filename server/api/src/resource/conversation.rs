@@ -1,6 +1,5 @@
 use actix_identity::Identity;
 use actix_web::*;
-use sea_orm::TryIntoModel;
 use serde::Serialize;
 use entity::conversation::CreateConversation;
 use service::{Mutation, Query};
@@ -20,7 +19,7 @@ struct ConversationInfo {
 async fn create_conversation(user: Identity, data: web::Data<AppState>, conversation: web::Json<CreateConversation>) -> Result<impl Responder> {
     let db_conversation = Mutation::create_conversation(&data.conn, conversation)
         .await
-        .map(|db_conversation| db_conversation.try_into_model().unwrap()).map_err(|err| error::ErrorInternalServerError(err))?;
+        .map_err(|err| error::ErrorInternalServerError(err))?;
 
     // TODO: Return db_conversation
     Ok(HttpResponse::Created().body("TODO"))
