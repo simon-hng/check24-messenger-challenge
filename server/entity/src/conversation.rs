@@ -3,10 +3,12 @@
 use super::sea_orm_active_enums::ConversationState;
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use crate::account;
 
 #[derive(Deserialize)]
 pub struct CreateConversation {
     pub state: Option<ConversationState>,
+    pub recipient: account::Model,
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]

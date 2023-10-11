@@ -17,7 +17,13 @@ struct ConversationInfo {
 
 #[post("/")]
 async fn create_conversation(user: Identity, data: web::Data<AppState>, conversation: web::Json<CreateConversation>) -> Result<impl Responder> {
-    let db_conversation = Mutation::create_conversation(&data.conn, conversation)
+    let user_id: i32 = user
+        .id()
+        .map_err(|err| error::ErrorUnauthorized(err))?
+        .parse()
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+
+    let db_conversation = Mutation::create_conversation(&data.conn, conversation, user_id)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
