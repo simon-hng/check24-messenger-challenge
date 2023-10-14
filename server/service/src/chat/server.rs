@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use actix::prelude::*;
+use actix_web::cookie::{Key};
 use entity::{sea_orm_active_enums::MessageType};
 use sea_orm::{DatabaseConnection};
 use serde::Deserialize;
@@ -15,33 +16,34 @@ pub struct ServerMessage(pub String);
 pub struct CreateMessage {
     pub message_type: Option<MessageType>,
     pub text: String,
-    pub sender_id: Option<i32>,
-    pub recipient_id: Option<i32>,
-    pub conversation_id: Option<i32>,
+    pub sender_id: i32,
+    pub recipient_id: i32,
+    pub conversation_id: i32,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Connect {
-    pub id: String,
+    pub id: i32,
     pub addr: Recipient<ServerMessage>,
 }
 
 #[derive(Message)]
 #[rtype(result = "()")]
 pub struct Disconnect {
-    pub id: String,
+    pub id: i32,
 }
 
-#[derive(Debug)]
 pub struct MessageServer {
     db_connection: DatabaseConnection,
-    sessions: HashMap<String, Recipient<ServerMessage>>,
+    sessions: HashMap<i32, Recipient<ServerMessage>>,
+    key: Key,
 }
 
 impl MessageServer {
-    pub fn new(app_state: AppState) -> MessageServer {
+    pub fn new(app_state: AppState, key: Key) -> MessageServer {
         MessageServer {
+            key,
             db_connection: app_state.conn,
             sessions: HashMap::new(),
         }
@@ -56,7 +58,12 @@ impl Handler<Connect> for MessageServer {
     type Result = ();
 
     fn handle(&mut self, msg: Connect, _ctx: &mut Self::Context) -> Self::Result {
-        self.sessions.insert(msg.id, msg.addr);
+        /*
+         TODO: I wanted to check the cookie but this is getting out of hand so we just
+               believe the client that it is what they say they are
+         */
+        self.sessions.insert(msg.id.to_owned(), msg.addr);
+        log::info!("Added {} to the session", msg.id);
     }
 }
 
@@ -72,10 +79,10 @@ impl Handler<CreateMessage> for MessageServer {
     type Result = ();
 
     fn handle(&mut self, msg: CreateMessage, _ctx: &mut Self::Context) -> Self::Result {
-        log::info!("Received a chat message");
-        let _recipient = self
+        log::info!("Received a chat message {:?}", msg);
+        let recipient = self
             .sessions
-            .get(&msg.recipient_id.expect("should not happen").to_string())
+            .get(&msg.recipient_id)
             .ok_or("Recipient not found")
             .expect("TODO return error");
     }

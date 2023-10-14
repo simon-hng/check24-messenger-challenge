@@ -36,7 +36,7 @@ impl Mutation {
     ) -> Result<message::Model, DbErr> {
         message::ActiveModel {
             message_type: Set(message.message_type.to_owned()),
-            conversation_id: Set(message.conversation_id.to_owned()),
+            conversation_id: Set(Some(message.conversation_id.to_owned())),
             recipient_id: Set(message.recipient_id.to_owned()),
             sender_id: Set(message.sender_id.to_owned()),
             text: Set(message.text.to_owned()),

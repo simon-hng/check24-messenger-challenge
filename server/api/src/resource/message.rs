@@ -38,7 +38,7 @@ async fn post_message(
     Ok(HttpResponse::Created().body("TODO"))
 }
 
-#[get("/receive")]
+#[get("/ws")]
 async fn receive_messages(
     req: HttpRequest,
     stream: web::Payload,
@@ -48,6 +48,7 @@ async fn receive_messages(
         session::WsChatSession {
             heart_beat: Instant::now(),
             addr: server.get_ref().clone(),
+            account: None,
         },
         &req,
         stream,
