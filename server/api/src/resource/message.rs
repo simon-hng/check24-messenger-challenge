@@ -48,7 +48,7 @@ async fn receive_messages(
         session::WsChatSession {
             heart_beat: Instant::now(),
             addr: server.get_ref().clone(),
-            account: None,
+            account_id: None,
         },
         &req,
         stream,

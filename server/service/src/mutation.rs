@@ -34,6 +34,7 @@ impl Mutation {
         db: &DbConn,
         message: CreateMessage,
     ) -> Result<message::Model, DbErr> {
+        log::info!("Adding message to DB {:?}", message);
         message::ActiveModel {
             message_type: Set(message.message_type.to_owned()),
             conversation_id: Set(message.conversation_id.to_owned()),

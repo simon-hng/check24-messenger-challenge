@@ -1,10 +1,21 @@
 use ::entity::{
+    account,
     conversation,
     prelude::{Account, Conversation},
 };
 use sea_orm::*;
 
 pub struct Query;
+
+impl Query {
+    pub async fn find_account_by_id(
+        db: &DbConn,
+        account_id: i32,
+    ) -> Result<Option<account::Model>, DbErr> {
+        Account::find_by_id(account_id).one(db).await
+    }
+}
+
 impl Query {
     pub async fn find_conversation_by_account_id(
         db: &DbConn,
