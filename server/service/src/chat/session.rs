@@ -1,11 +1,9 @@
 use std::time::Instant;
 
 use actix::prelude::*;
-use actix_web::cookie::{Cookie, CookieJar};
 use actix_web_actors::ws;
 use serde::Deserialize;
 use entity::account;
-use entity::account::Model;
 use entity::sea_orm_active_enums::MessageType;
 
 use super::server;
@@ -71,7 +69,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     WSMessage::ChatMessage { text, recipient_id, conversation_id, message_type } => {
                         log::debug!("Received chat message\n{}", text);
                         self.addr.send(server::CreateMessage {
-                            message_type: None,
+                            message_type,
                             text,
                             sender_id: account.id,
                             recipient_id,
@@ -91,6 +89,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
 enum WSMessage {
-    ChatMessage { text: String, recipient_id: i32, conversation_id: i32, message_type: Option<MessageType> },
+    ChatMessage { text: String, recipient_id: i32, conversation_id: i32, message_type: MessageType },
     AuthMessage { id: i32, cookie: Option<String> },
 }

@@ -14,7 +14,7 @@ pub struct ServerMessage(pub String);
 #[derive(Debug, Message, Deserialize, Clone)]
 #[rtype(result = "()")]
 pub struct CreateMessage {
-    pub message_type: Option<MessageType>,
+    pub message_type: MessageType,
     pub text: String,
     pub sender_id: i32,
     pub recipient_id: i32,
