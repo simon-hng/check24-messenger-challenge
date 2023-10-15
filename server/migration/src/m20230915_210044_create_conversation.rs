@@ -165,6 +165,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(Message::MessageType)
+                            .not_null()
                             .enumeration(MessageType::Table, MessageType::iter().skip(1)),
                     )
                     .col(ColumnDef::new(Message::Text).string().not_null())
@@ -175,9 +176,9 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_date())
                             .not_null(),
                     )
-                    .col(ColumnDef::new(Message::RecipientId).integer())
-                    .col(ColumnDef::new(Message::SenderId).integer())
-                    .col(ColumnDef::new(Message::ConversationId).integer())
+                    .col(ColumnDef::new(Message::RecipientId).integer().not_null())
+                    .col(ColumnDef::new(Message::SenderId).integer().not_null())
+                    .col(ColumnDef::new(Message::ConversationId).integer().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("recipient_id")
