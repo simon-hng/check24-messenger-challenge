@@ -31,8 +31,7 @@ async fn create_conversation(
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    // TODO: Return db_conversation
-    Ok(HttpResponse::Created().body("TODO"))
+    Ok(HttpResponse::Created().json(db_conversation))
 }
 
 #[get("/")]

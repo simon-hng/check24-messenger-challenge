@@ -85,7 +85,7 @@ impl Handler<CreateMessage> for MessageServer {
         recipient
             .send(msg)
             .into_actor(self)
-            .then(|res, act, ctx| fut::ready(()))
+            .then(|_res, _act, _ctx| fut::ready(()))
             .wait(ctx);
     }
 }
