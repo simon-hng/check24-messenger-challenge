@@ -4,12 +4,12 @@ use actix_identity::IdentityMiddleware;
 use actix_session::{storage::RedisSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware, web, App, HttpServer};
 use dotenvy::dotenv;
+use entity::app::AppState;
 use migration::{Migrator, MigratorTrait};
 use resource::{auth, conversation, message};
-use sea_orm::{Database};
-use std::env;
-use entity::app::AppState;
+use sea_orm::Database;
 use service::server;
+use std::env;
 
 mod resource;
 
@@ -57,7 +57,7 @@ pub async fn main() -> std::io::Result<()> {
             .configure(conversation::init_service)
             .configure(message::init_service)
     })
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
+use crate::Mutation;
 use actix::prelude::*;
-use actix_web::cookie::{Key};
+use actix_web::cookie::Key;
+use entity::app::AppState;
 use entity::sea_orm_active_enums::MessageType;
 use sea_orm::DatabaseConnection;
 use serde::Deserialize;
-use entity::app::AppState;
-use crate::Mutation;
 
 #[derive(Message)]
 #[rtype(result = "()")]

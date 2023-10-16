@@ -1,7 +1,7 @@
 use actix_identity::Identity;
 use actix_web::*;
-use serde::Serialize;
 use entity::conversation::CreateConversation;
+use serde::Serialize;
 use service::{Mutation, Query};
 
 use crate::AppState;
@@ -16,7 +16,11 @@ struct ConversationInfo {
 }
 
 #[post("/")]
-async fn create_conversation(user: Identity, data: web::Data<AppState>, conversation: web::Json<CreateConversation>) -> Result<impl Responder> {
+async fn create_conversation(
+    user: Identity,
+    data: web::Data<AppState>,
+    conversation: web::Json<CreateConversation>,
+) -> Result<impl Responder> {
     let user_id: i32 = user
         .id()
         .map_err(|err| error::ErrorUnauthorized(err))?

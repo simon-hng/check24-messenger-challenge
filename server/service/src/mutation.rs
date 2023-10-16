@@ -1,29 +1,37 @@
+use crate::server::CreateMessage;
 use actix_web::web::Json;
+use entity::conversation::CreateConversation;
 use entity::{conversation, conversation_account, message};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, DbConn, DbErr, Set};
-use entity::conversation::CreateConversation;
-use crate::server::CreateMessage;
 
 pub struct Mutation;
 
 impl Mutation {
-    pub async fn create_conversation(db: &DatabaseConnection, conversation: Json<CreateConversation>, sender_id: i32) ->
-    Result<conversation::Model, DbErr>
-    {
+    pub async fn create_conversation(
+        db: &DatabaseConnection,
+        conversation: Json<CreateConversation>,
+        sender_id: i32,
+    ) -> Result<conversation::Model, DbErr> {
         let db_conversation = conversation::ActiveModel {
             state: Set(conversation.state.to_owned()),
             ..Default::default()
-        }.insert(db).await?;
+        }
+        .insert(db)
+        .await?;
 
         conversation_account::ActiveModel {
             conversation_id: Set(db_conversation.id.to_owned()),
             account_id: Set(conversation.recipient.id.to_owned()),
-        }.insert(db).await?;
+        }
+        .insert(db)
+        .await?;
 
         conversation_account::ActiveModel {
             conversation_id: Set(db_conversation.id.to_owned()),
             account_id: Set(sender_id),
-        }.insert(db).await?;
+        }
+        .insert(db)
+        .await?;
 
         Ok(db_conversation)
     }
@@ -42,6 +50,8 @@ impl Mutation {
             sender_id: Set(message.sender_id.to_owned()),
             text: Set(message.text.to_owned()),
             ..Default::default()
-        }.insert(db).await
+        }
+        .insert(db)
+        .await
     }
 }

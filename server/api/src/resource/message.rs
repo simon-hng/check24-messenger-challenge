@@ -4,10 +4,10 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
-use sea_orm::TryIntoModel;
 use entity::app::AppState;
-use service::{Mutation, server, session};
+use sea_orm::TryIntoModel;
 use service::server::CreateMessage;
+use service::{server, session, Mutation};
 
 #[post("/")]
 async fn post_message(
@@ -20,7 +20,9 @@ async fn post_message(
         .ok_or("Not Authenticated")
         .map_err(|err| error::ErrorUnauthorized(err))?;
     let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
-    let user_id: i32 = user_id.parse().map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id: i32 = user_id
+        .parse()
+        .map_err(|err| error::ErrorUnauthorized(err))?;
 
     let mut msg = message.into_inner();
     msg.sender_id = user_id;

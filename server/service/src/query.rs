@@ -1,6 +1,5 @@
 use ::entity::{
-    account,
-    conversation,
+    account, conversation,
     prelude::{Account, Conversation},
 };
 use sea_orm::*;
