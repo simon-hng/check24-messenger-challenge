@@ -26,7 +26,8 @@ async fn post_message(
 
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
-    let result = server
+
+    server
         .send(msg.to_owned())
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
@@ -37,7 +38,7 @@ async fn post_message(
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
     // TODO: Return db_msg
-    Ok(HttpResponse::Created().body("TODO"))
+    Ok(HttpResponse::Created().json(db_msg))
 }
 
 #[get("/ws")]

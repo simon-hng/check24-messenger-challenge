@@ -5,6 +5,8 @@ use actix_web_actors::ws;
 use entity::sea_orm_active_enums::MessageType;
 use serde::Deserialize;
 
+use crate::server::CreateMessage;
+
 use super::server;
 
 pub struct WsChatSession {
@@ -22,11 +24,11 @@ impl Actor for WsChatSession {
 }
 
 // Takes message from the server and forwards it to the client
-impl Handler<server::ServerMessage> for WsChatSession {
+impl Handler<CreateMessage> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: server::ServerMessage, ctx: &mut Self::Context) {
-        ctx.text(msg.0);
+    fn handle(&mut self, msg: CreateMessage, ctx: &mut Self::Context) {
+        ctx.text(msg.text);
     }
 }
 
