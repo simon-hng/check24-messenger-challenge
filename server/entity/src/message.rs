@@ -7,15 +7,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "message")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub id: Uuid,
     pub message_type: MessageType,
     pub text: String,
     pub read_at: Option<DateTime>,
     pub created_at: DateTime,
-    pub recipient_id: i32,
-    pub sender_id: i32,
-    pub conversation_id: i32,
+    pub recipient_id: Uuid,
+    pub sender_id: Uuid,
+    pub conversation_id: Uuid,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

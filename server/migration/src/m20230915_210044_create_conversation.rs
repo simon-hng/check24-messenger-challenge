@@ -78,9 +78,9 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(Conversation::Id)
-                            .integer()
+                            .uuid()
+                            .extra("DEFAULT uuid_generate_v4()")
                             .not_null()
-                            .auto_increment()
                             .primary_key(),
                     )
                     .col(
@@ -106,12 +106,12 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(ConversationAccount::ConversationId)
-                            .integer()
+                            .uuid()
                             .not_null(),
                     )
                     .col(
                         ColumnDef::new(ConversationAccount::AccountId)
-                            .integer()
+                            .uuid()
                             .not_null(),
                     )
                     .primary_key(
@@ -158,9 +158,9 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(Message::Id)
-                            .integer()
+                            .uuid()
+                            .extra("DEFAULT uuid_generate_v4()")
                             .not_null()
-                            .auto_increment()
                             .primary_key(),
                     )
                     .col(
@@ -176,9 +176,9 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_date())
                             .not_null(),
                     )
-                    .col(ColumnDef::new(Message::RecipientId).integer().not_null())
-                    .col(ColumnDef::new(Message::SenderId).integer().not_null())
-                    .col(ColumnDef::new(Message::ConversationId).integer().not_null())
+                    .col(ColumnDef::new(Message::RecipientId).uuid().not_null())
+                    .col(ColumnDef::new(Message::SenderId).uuid().not_null())
+                    .col(ColumnDef::new(Message::ConversationId).uuid().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("recipient_id")

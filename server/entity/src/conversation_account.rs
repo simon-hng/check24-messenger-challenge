@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "conversation_account")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub conversation_id: i32,
+    pub conversation_id: Uuid,
     #[sea_orm(primary_key, auto_increment = false)]
-    pub account_id: i32,
+    pub account_id: Uuid,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
