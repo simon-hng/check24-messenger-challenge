@@ -6,13 +6,13 @@ use actix_web::*;
 use actix_web_actors::ws;
 use entity::app::AppState;
 use sea_orm::TryIntoModel;
-use service::server::CreateMessage;
+use service::actor_message::{Notification, NotifyMessage};
 use service::{server, session, Mutation};
 
 #[post("/")]
 async fn post_message(
     server: web::Data<Addr<server::MessageServer>>,
-    message: web::Json<CreateMessage>,
+    message: web::Json<NotifyMessage>,
     user: Option<Identity>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
@@ -28,7 +28,7 @@ async fn post_message(
     msg.sender_id = user_id;
 
     server
-        .send(msg.to_owned())
+        .send(Notification::Message(msg.to_owned()))
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
@@ -37,7 +37,6 @@ async fn post_message(
         .map(|db_message| db_message.try_into_model().expect("TODO"))
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    // TODO: Return db_msg
     Ok(HttpResponse::Created().json(db_msg))
 }
 

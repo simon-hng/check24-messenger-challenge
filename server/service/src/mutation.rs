@@ -1,4 +1,4 @@
-use crate::server::CreateMessage;
+use crate::actor_message::NotifyMessage;
 use actix_web::web::Json;
 use entity::conversation::CreateConversation;
 use entity::{conversation, conversation_account, message};
@@ -40,7 +40,7 @@ impl Mutation {
 impl Mutation {
     pub async fn create_message(
         db: &DbConn,
-        message: CreateMessage,
+        message: NotifyMessage,
     ) -> Result<message::Model, DbErr> {
         log::info!("Adding message to DB {:?}", message);
         message::ActiveModel {

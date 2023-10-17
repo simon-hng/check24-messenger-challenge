@@ -1,35 +1,12 @@
 use std::collections::HashMap;
 
+use crate::actor_message::NotifyMessage;
+use crate::chat::actor_message::{Connect, Disconnect, Notification};
 use actix::prelude::*;
 use actix_web::cookie::Key;
-use entity::sea_orm_active_enums::MessageType;
-use serde::Deserialize;
-
-#[derive(Debug, Message, Deserialize, Clone)]
-#[rtype(result = "()")]
-pub struct CreateMessage {
-    pub message_type: MessageType,
-    pub text: String,
-    pub sender_id: i32,
-    pub recipient_id: i32,
-    pub conversation_id: i32,
-}
-
-#[derive(Message)]
-#[rtype(result = "i32")]
-pub struct Connect {
-    pub id: i32,
-    pub addr: Recipient<CreateMessage>,
-}
-
-#[derive(Message)]
-#[rtype(result = "()")]
-pub struct Disconnect {
-    pub id: i32,
-}
 
 pub struct MessageServer {
-    sessions: HashMap<i32, Recipient<CreateMessage>>,
+    sessions: HashMap<i32, Recipient<Notification>>,
     _key: Key,
 }
 
@@ -70,22 +47,27 @@ impl Handler<Disconnect> for MessageServer {
     }
 }
 
-impl Handler<CreateMessage> for MessageServer {
+impl Handler<Notification> for MessageServer {
     type Result = ();
 
-    fn handle(&mut self, msg: CreateMessage, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: Notification, ctx: &mut Self::Context) -> Self::Result {
         log::info!("Forwarding message {:?}", msg);
 
-        let recipient = self
-            .sessions
-            .get(&msg.recipient_id)
-            .ok_or("Recipient not found")
-            .expect("TODO return error");
+        match msg {
+            Notification::Message(NotifyMessage { recipient_id, .. }) => {
+                let recipient = self
+                    .sessions
+                    .get(&recipient_id)
+                    .ok_or("Recipient not found")
+                    .expect("TODO return error");
 
-        recipient
-            .send(msg)
-            .into_actor(self)
-            .then(|_res, _act, _ctx| fut::ready(()))
-            .wait(ctx);
+                recipient
+                    .send(msg)
+                    .into_actor(self)
+                    .then(|_res, _act, _ctx| fut::ready(()))
+                    .wait(ctx);
+            }
+            _ => {}
+        }
     }
 }

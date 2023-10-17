@@ -1,11 +1,11 @@
 use std::time::Instant;
 
+use crate::actor_message::{Connect, NotifyMessage};
+use crate::chat::actor_message::Notification;
 use actix::prelude::*;
 use actix_web_actors::ws;
 use entity::sea_orm_active_enums::MessageType;
 use serde::Deserialize;
-
-use crate::server::CreateMessage;
 
 use super::server;
 
@@ -23,16 +23,34 @@ impl Actor for WsChatSession {
     }
 }
 
-// Takes message from the server and forwards it to the client
-impl Handler<CreateMessage> for WsChatSession {
+impl Handler<Notification> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: CreateMessage, ctx: &mut Self::Context) {
-        ctx.text(msg.text);
+    fn handle(&mut self, msg: Notification, ctx: &mut Self::Context) {
+        match msg {
+            Notification::Message(NotifyMessage { text, .. }) => {
+                ctx.text(text);
+            }
+            _ => {}
+        }
     }
 }
 
-/// WebSocket message handler
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type")]
+enum WSMessage {
+    ChatMessage {
+        text: String,
+        recipient_id: i32,
+        conversation_id: i32,
+        message_type: MessageType,
+    },
+    AuthMessage {
+        id: i32,
+        cookie: Option<String>,
+    },
+}
+
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
@@ -52,14 +70,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     None => {
                         if let WSMessage::AuthMessage { id, .. } = message {
                             let session_addr = ctx.address();
-                            self.addr
-                                .send(server::Connect {
-                                    id,
-                                    addr: session_addr.recipient(),
-                                })
-                                .into_actor(self)
-                                .then(|_res, _act, _ctx| fut::ready(()))
-                                .wait(ctx);
+                            self.addr.do_send(Connect {
+                                id,
+                                addr: session_addr.recipient(),
+                            });
 
                             self.account_id = Some(id);
                         }
@@ -77,13 +91,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                         message_type,
                     } => {
                         log::debug!("Received chat message\n{}", text);
-                        self.addr.do_send(server::CreateMessage {
+
+                        self.addr.do_send(Notification::Message(NotifyMessage {
                             message_type,
                             text,
                             sender_id: account_id,
                             recipient_id,
                             conversation_id,
-                        })
+                        }))
                     }
                     _ => {}
                 }
@@ -91,19 +106,4 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             _ => todo!(),
         }
     }
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(tag = "type")]
-enum WSMessage {
-    ChatMessage {
-        text: String,
-        recipient_id: i32,
-        conversation_id: i32,
-        message_type: MessageType,
-    },
-    AuthMessage {
-        id: i32,
-        cookie: Option<String>,
-    },
 }
