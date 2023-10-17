@@ -20,7 +20,7 @@ async fn post_message(
         .ok_or("Not Authenticated")
         .map_err(|err| error::ErrorUnauthorized(err))?;
     let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
-    let user_id: i32 = user_id
+    let user_id = user_id
         .parse()
         .map_err(|err| error::ErrorUnauthorized(err))?;
 

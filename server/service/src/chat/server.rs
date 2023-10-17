@@ -4,9 +4,10 @@ use crate::actor_message::NotifyMessage;
 use crate::chat::actor_message::{Connect, Disconnect, Notification};
 use actix::prelude::*;
 use actix_web::cookie::Key;
+use sea_orm::prelude::Uuid;
 
 pub struct MessageServer {
-    sessions: HashMap<i32, Recipient<Notification>>,
+    sessions: HashMap<Uuid, Recipient<Notification>>,
     _key: Key,
 }
 
@@ -24,7 +25,7 @@ impl Actor for MessageServer {
 }
 
 impl Handler<Connect> for MessageServer {
-    type Result = i32;
+    type Result = ();
 
     fn handle(&mut self, msg: Connect, _ctx: &mut Self::Context) -> Self::Result {
         /*
@@ -34,8 +35,6 @@ impl Handler<Connect> for MessageServer {
 
         log::info!("Added {} to the sessions", msg.id);
         self.sessions.insert(msg.id.to_owned(), msg.addr);
-
-        msg.id
     }
 }
 

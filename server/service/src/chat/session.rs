@@ -5,6 +5,7 @@ use crate::chat::actor_message::Notification;
 use actix::prelude::*;
 use actix_web_actors::ws;
 use entity::sea_orm_active_enums::MessageType;
+use sea_orm::prelude::Uuid;
 use serde::Deserialize;
 
 use super::server;
@@ -12,7 +13,7 @@ use super::server;
 pub struct WsChatSession {
     pub heart_beat: Instant,
     pub addr: Addr<server::MessageServer>,
-    pub account_id: Option<i32>,
+    pub account_id: Option<Uuid>,
 }
 
 impl Actor for WsChatSession {
@@ -41,12 +42,12 @@ impl Handler<Notification> for WsChatSession {
 enum WSMessage {
     ChatMessage {
         text: String,
-        recipient_id: i32,
-        conversation_id: i32,
+        recipient_id: Uuid,
+        conversation_id: Uuid,
         message_type: MessageType,
     },
     AuthMessage {
-        id: i32,
+        id: Uuid,
         cookie: Option<String>,
     },
 }
