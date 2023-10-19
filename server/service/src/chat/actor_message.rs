@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct NotifyMessage {
+    pub id: Option<Uuid>,
     pub message_type: MessageType,
     pub text: String,
     pub sender_id: Uuid,
@@ -14,12 +15,14 @@ pub struct NotifyMessage {
 
 #[derive(Debug, Clone)]
 pub struct NotifyReceived {
+    pub id: Uuid,
     pub message_id: Uuid,
     pub sender_id: Uuid,
 }
 
 #[derive(Debug, Clone)]
 pub struct NotifyRead {
+    pub id: Uuid,
     pub message_id: Uuid,
     pub sender_id: Uuid,
 }

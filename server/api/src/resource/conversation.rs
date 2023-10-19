@@ -1,6 +1,6 @@
 use actix_identity::Identity;
 use actix_web::*;
-use entity::conversation::CreateConversation;
+use entity::active::NewConversation;
 use sea_orm::prelude::Uuid;
 use serde::Serialize;
 use service::{Mutation, Query};
@@ -20,7 +20,7 @@ struct ConversationInfo {
 async fn create_conversation(
     user: Identity,
     data: web::Data<AppState>,
-    conversation: web::Json<CreateConversation>,
+    conversation: web::Json<NewConversation>,
 ) -> Result<impl Responder> {
     let user_id: Uuid = user
         .id()

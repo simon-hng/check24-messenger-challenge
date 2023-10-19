@@ -1,6 +1,6 @@
 use crate::actor_message::NotifyMessage;
 use actix_web::web::Json;
-use entity::conversation::CreateConversation;
+use entity::active::NewConversation;
 use entity::{conversation, conversation_account, message};
 use sea_orm::prelude::Uuid;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, DbConn, DbErr, Set};
@@ -10,7 +10,7 @@ pub struct Mutation;
 impl Mutation {
     pub async fn create_conversation(
         db: &DatabaseConnection,
-        conversation: Json<CreateConversation>,
+        conversation: Json<NewConversation>,
         sender_id: Uuid,
     ) -> Result<conversation::Model, DbErr> {
         let db_conversation = conversation::ActiveModel {

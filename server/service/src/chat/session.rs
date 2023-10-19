@@ -40,16 +40,7 @@ impl Handler<Notification> for WsChatSession {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
 enum WSMessage {
-    ChatMessage {
-        text: String,
-        recipient_id: Uuid,
-        conversation_id: Uuid,
-        message_type: MessageType,
-    },
-    AuthMessage {
-        id: Uuid,
-        cookie: Option<String>,
-    },
+    AuthMessage { id: Uuid, cookie: Option<String> },
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
@@ -85,22 +76,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 };
 
                 match message {
-                    WSMessage::ChatMessage {
-                        text,
-                        recipient_id,
-                        conversation_id,
-                        message_type,
-                    } => {
-                        log::debug!("Received chat message\n{}", text);
-
-                        self.addr.do_send(Notification::Message(NotifyMessage {
-                            message_type,
-                            text,
-                            sender_id: account_id,
-                            recipient_id,
-                            conversation_id,
-                        }))
-                    }
                     _ => {}
                 }
             }
