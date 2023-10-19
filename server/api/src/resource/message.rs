@@ -27,14 +27,16 @@ async fn post_message(
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
 
-    server
-        .send(Notification::Message(msg.to_owned()))
-        .await
-        .map_err(|err| error::ErrorInternalServerError(err))?;
-
-    let db_msg = Mutation::create_message(&data.conn, msg)
+    let db_msg = Mutation::create_message(&data.conn, msg.to_owned())
         .await
         .map(|db_message| db_message.try_into_model().expect("TODO"))
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    let notify_message: NotifyMessage = db_msg.to_owned().into();
+
+    server
+        .send(Notification::Message(notify_message))
+        .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
     Ok(HttpResponse::Created().json(db_msg))

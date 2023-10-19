@@ -1,12 +1,9 @@
-use std::time::Instant;
-
-use crate::actor_message::{Connect, NotifyMessage};
+use crate::actor_message::{Connect, NotifyAuth};
 use crate::chat::actor_message::Notification;
 use actix::prelude::*;
 use actix_web_actors::ws;
-use entity::sea_orm_active_enums::MessageType;
 use sea_orm::prelude::Uuid;
-use serde::Deserialize;
+use std::time::Instant;
 
 use super::server;
 
@@ -29,18 +26,13 @@ impl Handler<Notification> for WsChatSession {
 
     fn handle(&mut self, msg: Notification, ctx: &mut Self::Context) {
         match msg {
-            Notification::Message(NotifyMessage { text, .. }) => {
-                ctx.text(text);
+            Notification::Message(notification) => {
+                let notification = serde_json::to_string(&notification).unwrap();
+                ctx.text(notification);
             }
             _ => {}
         }
     }
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(tag = "type")]
-enum WSMessage {
-    AuthMessage { id: Uuid, cookie: Option<String> },
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
@@ -55,12 +47,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
 
         match msg {
             ws::Message::Text(msg) => {
-                let message: WSMessage =
+                let message: Notification =
                     serde_json::from_str(std::str::from_utf8(msg.as_ref()).unwrap()).unwrap();
 
                 let account_id = match self.account_id.to_owned() {
                     None => {
-                        if let WSMessage::AuthMessage { id, .. } = message {
+                        if let Notification::Auth(NotifyAuth { id, .. }) = message {
                             let session_addr = ctx.address();
                             self.addr.do_send(Connect {
                                 id,
