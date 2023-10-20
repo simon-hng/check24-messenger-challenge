@@ -6,8 +6,7 @@ use actix_web::*;
 use actix_web_actors::ws;
 use entity::app::AppState;
 use sea_orm::prelude::Uuid;
-use sea_orm::TryIntoModel;
-use service::actor_message::{Notification, NotifyMessage};
+use service::actor_message::{Notification, NotifyMessage, NotifyRead};
 use service::{server, session, Mutation};
 
 fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
@@ -24,24 +23,23 @@ fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
 #[post("/")]
 async fn post_message(
     server: web::Data<Addr<server::MessageServer>>,
-    message: web::Json<NotifyMessage>,
+    notification: web::Json<NotifyMessage>,
     user: Option<Identity>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
     let user_id = get_user_id(user)?;
 
-    let mut msg = message.into_inner();
-    msg.sender_id = user_id;
+    let mut notification = notification.into_inner();
+    notification.sender_id = user_id;
 
-    let db_msg = Mutation::create_message(&data.conn, msg.to_owned())
+    let db_msg = Mutation::create_message(&data.conn, notification.to_owned())
         .await
-        .map(|db_message| db_message.try_into_model().expect("TODO"))
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    let notify_message: NotifyMessage = db_msg.to_owned().into();
+    let notification: NotifyMessage = db_msg.to_owned().into();
 
     server
-        .send(Notification::Message(notify_message))
+        .send(Notification::Message(notification))
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
@@ -51,11 +49,24 @@ async fn post_message(
 #[post("/read/")]
 async fn notify_read(
     server: web::Data<Addr<server::MessageServer>>,
+    notification: web::Json<NotifyRead>,
     user: Option<Identity>,
+    data: web::Data<AppState>,
 ) -> Result<impl Responder> {
-    let user_id = get_user_id(user)?;
+    let _user_id = get_user_id(user)?;
+    let notification = notification.into_inner();
+    let db_msg = Mutation::update_message_read(&data.conn, notification)
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    Ok("TODO")
+    let notification: NotifyRead = db_msg.to_owned().into();
+
+    server
+        .send(Notification::Read(notification))
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    Ok(web::Json(db_msg))
 }
 
 #[get("/ws")]

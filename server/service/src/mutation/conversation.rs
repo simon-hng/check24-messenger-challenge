@@ -1,7 +1,8 @@
 use crate::Mutation;
 use actix_web::web::Json;
 use entity::active::NewConversation;
-use entity::{conversation, conversation_account};
+use entity::conversation::{ActiveModel, Model};
+use entity::conversation_account;
 use sea_orm::prelude::Uuid;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, Set};
 
@@ -10,8 +11,8 @@ impl Mutation {
         db: &DatabaseConnection,
         conversation: Json<NewConversation>,
         sender_id: Uuid,
-    ) -> Result<conversation::Model, DbErr> {
-        let db_conversation = conversation::ActiveModel {
+    ) -> Result<Model, DbErr> {
+        let db_conversation = ActiveModel {
             state: Set(conversation.state.to_owned()),
             ..Default::default()
         }
