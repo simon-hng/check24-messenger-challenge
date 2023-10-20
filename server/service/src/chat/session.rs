@@ -67,9 +67,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                     Some(account) => account,
                 };
 
-                match message {
-                    _ => {}
-                }
+                self.addr.do_send(message);
             }
             _ => todo!(),
         }

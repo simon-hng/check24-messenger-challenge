@@ -31,16 +31,14 @@ impl From<message::Model> for NotifyMessage {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct NotifyReceived {
-    pub id: Uuid,
     pub message_id: Uuid,
-    pub sender_id: Uuid,
+    pub recipient_id: Uuid,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct NotifyRead {
-    pub id: Uuid,
     pub message_id: Uuid,
-    pub sender_id: Uuid,
+    pub recipient_id: Uuid,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

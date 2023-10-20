@@ -5,9 +5,21 @@ use actix_identity::Identity;
 use actix_web::*;
 use actix_web_actors::ws;
 use entity::app::AppState;
+use sea_orm::prelude::Uuid;
 use sea_orm::TryIntoModel;
 use service::actor_message::{Notification, NotifyMessage};
 use service::{server, session, Mutation};
+
+fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
+    let user = user
+        .ok_or("Not Authenticated")
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id = user_id
+        .parse()
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+    Ok(user_id)
+}
 
 #[post("/")]
 async fn post_message(
@@ -16,13 +28,7 @@ async fn post_message(
     user: Option<Identity>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
-    let user = user
-        .ok_or("Not Authenticated")
-        .map_err(|err| error::ErrorUnauthorized(err))?;
-    let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
-    let user_id = user_id
-        .parse()
-        .map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id = get_user_id(user)?;
 
     let mut msg = message.into_inner();
     msg.sender_id = user_id;
@@ -40,6 +46,16 @@ async fn post_message(
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
     Ok(HttpResponse::Created().json(db_msg))
+}
+
+#[post("/read/")]
+async fn notify_read(
+    server: web::Data<Addr<server::MessageServer>>,
+    user: Option<Identity>,
+) -> Result<impl Responder> {
+    let user_id = get_user_id(user)?;
+
+    todo!("implement updating of message in db and notify through MessageServer");
 }
 
 #[get("/ws")]
