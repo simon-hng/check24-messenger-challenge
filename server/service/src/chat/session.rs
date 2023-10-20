@@ -7,13 +7,13 @@ use std::time::Instant;
 
 use super::server;
 
-pub struct WsChatSession {
+pub struct WsNotifierSession {
     pub heart_beat: Instant,
-    pub addr: Addr<server::MessageServer>,
+    pub addr: Addr<server::NotificationServer>,
     pub account_id: Option<Uuid>,
 }
 
-impl Actor for WsChatSession {
+impl Actor for WsNotifierSession {
     type Context = ws::WebsocketContext<Self>;
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
@@ -21,21 +21,16 @@ impl Actor for WsChatSession {
     }
 }
 
-impl Handler<Notification> for WsChatSession {
+impl Handler<Notification> for WsNotifierSession {
     type Result = ();
 
     fn handle(&mut self, msg: Notification, ctx: &mut Self::Context) {
-        match msg {
-            Notification::Message(notification) => {
-                let notification = serde_json::to_string(&notification).unwrap();
-                ctx.text(notification);
-            }
-            _ => {}
-        }
+        let notification = serde_json::to_string(&msg).unwrap();
+        ctx.text(notification);
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsNotifierSession {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
             Err(_) => {
@@ -50,7 +45,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 let message: Notification =
                     serde_json::from_str(std::str::from_utf8(msg.as_ref()).unwrap()).unwrap();
 
-                let account_id = match self.account_id.to_owned() {
+                let _account_id = match self.account_id.to_owned() {
                     None => {
                         if let Notification::Auth(NotifyAuth { id, .. }) = message {
                             let session_addr = ctx.address();
@@ -68,6 +63,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
                 };
 
                 self.addr.do_send(message);
+            }
+            ws::Message::Binary(bin) => {
+                todo!();
             }
             _ => todo!(),
         }

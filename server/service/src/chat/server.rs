@@ -6,25 +6,25 @@ use actix::prelude::*;
 use actix_web::cookie::Key;
 use sea_orm::prelude::Uuid;
 
-pub struct MessageServer {
+pub struct NotificationServer {
     sessions: HashMap<Uuid, Recipient<Notification>>,
     _key: Key,
 }
 
-impl MessageServer {
-    pub fn new(key: Key) -> MessageServer {
-        MessageServer {
+impl NotificationServer {
+    pub fn new(key: Key) -> NotificationServer {
+        NotificationServer {
             _key: key,
             sessions: HashMap::new(),
         }
     }
 }
 
-impl Actor for MessageServer {
+impl Actor for NotificationServer {
     type Context = Context<Self>;
 }
 
-impl Handler<Connect> for MessageServer {
+impl Handler<Connect> for NotificationServer {
     type Result = ();
 
     fn handle(&mut self, msg: Connect, _ctx: &mut Self::Context) -> Self::Result {
@@ -38,7 +38,7 @@ impl Handler<Connect> for MessageServer {
     }
 }
 
-impl Handler<Disconnect> for MessageServer {
+impl Handler<Disconnect> for NotificationServer {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, _ctx: &mut Self::Context) -> Self::Result {
@@ -46,7 +46,7 @@ impl Handler<Disconnect> for MessageServer {
     }
 }
 
-impl Handler<Notification> for MessageServer {
+impl Handler<Notification> for NotificationServer {
     type Result = ();
 
     fn handle(&mut self, msg: Notification, _ctx: &mut Self::Context) -> Self::Result {

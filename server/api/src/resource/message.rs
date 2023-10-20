@@ -22,7 +22,7 @@ fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
 
 #[post("/")]
 async fn post_message(
-    server: web::Data<Addr<server::MessageServer>>,
+    server: web::Data<Addr<server::NotificationServer>>,
     notification: web::Json<NotifyMessage>,
     user: Option<Identity>,
     data: web::Data<AppState>,
@@ -48,7 +48,7 @@ async fn post_message(
 
 #[post("/read/")]
 async fn notify_read(
-    server: web::Data<Addr<server::MessageServer>>,
+    server: web::Data<Addr<server::NotificationServer>>,
     notification: web::Json<NotifyRead>,
     user: Option<Identity>,
     data: web::Data<AppState>,
@@ -73,10 +73,10 @@ async fn notify_read(
 async fn receive_messages(
     req: HttpRequest,
     stream: web::Payload,
-    server: web::Data<Addr<server::MessageServer>>,
+    server: web::Data<Addr<server::NotificationServer>>,
 ) -> Result<HttpResponse, Error> {
     ws::start(
-        session::WsChatSession {
+        session::WsNotifierSession {
             heart_beat: Instant::now(),
             addr: server.get_ref().clone(),
             account_id: None,
