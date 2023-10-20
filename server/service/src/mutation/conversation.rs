@@ -1,11 +1,9 @@
-use crate::actor_message::NotifyMessage;
+use crate::Mutation;
 use actix_web::web::Json;
 use entity::active::NewConversation;
-use entity::{conversation, conversation_account, message};
+use entity::{conversation, conversation_account};
 use sea_orm::prelude::Uuid;
-use sea_orm::{ActiveModelTrait, DatabaseConnection, DbConn, DbErr, Set};
-
-pub struct Mutation;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, Set};
 
 impl Mutation {
     pub async fn create_conversation(
@@ -35,24 +33,5 @@ impl Mutation {
         .await?;
 
         Ok(db_conversation)
-    }
-}
-
-impl Mutation {
-    pub async fn create_message(
-        db: &DbConn,
-        message: NotifyMessage,
-    ) -> Result<message::Model, DbErr> {
-        log::info!("Adding message to DB {:?}", message);
-        message::ActiveModel {
-            message_type: Set(message.message_type.to_owned()),
-            conversation_id: Set(message.conversation_id.to_owned()),
-            recipient_id: Set(message.recipient_id.to_owned()),
-            sender_id: Set(message.sender_id.to_owned()),
-            text: Set(message.text.to_owned()),
-            ..Default::default()
-        }
-        .insert(db)
-        .await
     }
 }

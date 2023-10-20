@@ -55,7 +55,7 @@ async fn notify_read(
 ) -> Result<impl Responder> {
     let user_id = get_user_id(user)?;
 
-    todo!("implement updating of message in db and notify through MessageServer");
+    Ok("TODO")
 }
 
 #[get("/ws")]
