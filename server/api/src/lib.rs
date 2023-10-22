@@ -51,6 +51,10 @@ pub async fn main() -> std::io::Result<()> {
             .wrap(
                 Cors::default()
                     .allowed_origin("http://localhost:5173")
+                    // TODO Configure cors correctly
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin()
                     .supports_credentials(),
             )
             .configure(auth::init_service)

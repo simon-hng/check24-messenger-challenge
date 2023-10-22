@@ -5,7 +5,7 @@
 	import type { Chat } from './types';
 	import axios from 'axios';
 	import ChatRow from './chatRow.svelte';
-	import { page } from '$app/stores';
+	import { userStore } from '$lib/userStore';
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],
@@ -16,8 +16,8 @@
 <div class="h-screen">
 	<div class="p-4 border-b border-surface-500">
 		<div class="flex items-center gap-3">
-			{#if $page.data.session?.user?.image}
-				<Avatar src={$page.data.session.user?.image} width="w-12" rounded="rounded-full" />
+			{#if $userStore?.picture}
+				<Avatar src={$userStore?.picture} width="w-12" rounded="rounded-full" />
 			{/if}
 			<h2 class="text-xl">Chats</h2>
 		</div>
