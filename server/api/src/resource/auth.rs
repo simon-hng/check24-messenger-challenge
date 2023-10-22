@@ -1,9 +1,8 @@
 use actix_identity::Identity;
 
 use actix_web::{error, get, post, web, HttpMessage, HttpRequest, HttpResponse, Responder, Result};
-use entity::{account, prelude::Account};
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
-
+use serde::Deserialize;
+use service::Query;
 
 use crate::AppState;
 
@@ -18,17 +17,20 @@ async fn whoami(user: Option<Identity>) -> Result<impl Responder> {
     Ok(message)
 }
 
-#[post("/login/{account_name}")]
+#[derive(Deserialize)]
+struct Login {
+    account_name: String,
+}
+
+#[post("/login")]
 async fn login(
     request: HttpRequest,
-    path: web::Path<String>,
+    login: web::Json<Login>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
-    let account_name: String = path.into_inner().parse().unwrap();
+    let account_name = login.into_inner().account_name;
 
-    let account = Account::find()
-        .filter(account::Column::Name.eq(&account_name))
-        .one(&data.conn)
+    let account = Query::find_account_by_name(&data.conn, account_name)
         .await
         .map_err(|err| error::ErrorServiceUnavailable(err))?;
 
@@ -39,7 +41,7 @@ async fn login(
     let account_id = account.id.to_string();
 
     let _ = Identity::login(&request.extensions(), account_id.to_owned());
-    Ok(account_id)
+    Ok(web::Json(account))
 }
 
 #[post("/logout")]
