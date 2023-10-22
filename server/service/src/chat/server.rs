@@ -62,12 +62,9 @@ impl Handler<Notification> for NotificationServer {
             }
         };
 
-        let recipient = self
-            .sessions
-            .get(&recipient_id)
-            .ok_or("Recipient not found")
-            .expect("TODO return error");
-
-        recipient.do_send(msg)
+        let recipient = self.sessions.get(&recipient_id);
+        if let Some(recipient) = recipient {
+            recipient.do_send(msg)
+        }
     }
 }
