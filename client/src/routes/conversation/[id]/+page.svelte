@@ -1,33 +1,23 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { beforeNavigate } from '$app/navigation';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import axios from 'axios';
 
-	let currentMessage = '';
-	let messages: any[] = [];
 	export let data;
 
-	let socket: WebSocket;
-	if (browser) {
-		socket = new WebSocket('ws://localhost:8080/conversation/ws');
-		socket.onopen = () => {
-			socket.send(`/join ${data.conversation_id}`);
-		};
-		socket.addEventListener('message', (event) => {
-			messages = [...messages, event.data];
-		});
-	}
-
-	beforeNavigate(() => {
-		socket.close();
-	});
+	let currentMessage = '';
+	let messages: any[] = [];
 
 	const sendHandler = () => {
 		axios.post('/message/', {
-			data: { text: currentMessage }
+			data: {
+				message_type: 'stadard',
+				text: currentMessage,
+				sender_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
+				recipient_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
+				conversation_id: '596d2176-ce04-47f3-8f9c-60a02e7e7e72'
+			}
 		});
 		messages = [...messages, currentMessage];
 		currentMessage = '';
@@ -49,7 +39,7 @@
 				class="flex-shrink-0"
 			/>
 			<div>
-				<h2 class="font-semibold text-xl">NAME</h2>
+				<h2 class="font-semibold text-xl">{data.id} {data.state} {data.created_at.toString()}</h2>
 				<p class="text-sm">online</p>
 			</div>
 		</div>

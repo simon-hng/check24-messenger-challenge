@@ -63,7 +63,7 @@ struct ConversationDetail {
     count_unread: i32,
 }
 
-#[get("/detail/{id}")]
+#[get("/{id}")]
 async fn get_conversation_by_id(
     path: web::Path<String>,
     data: web::Data<AppState>,
