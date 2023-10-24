@@ -1,29 +1,26 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
-	import { userStore } from '$lib/userStore';
-	import { Avatar } from '@skeletonlabs/skeleton';
+	import type { userStore } from '$lib/userStore';
 
+	let auth = getContext<typeof userStore>('auth');
 	const { form, handleChange, handleSubmit } = createForm({
 		initialValues: {
 			username: ''
 		},
 
 		onSubmit: async (values) => {
-			await userStore.login(values.username);
+			await auth.login(values.username);
 		}
 	});
 </script>
 
-{#if $userStore}
+{#if $auth}
 	<div class="m-8 flex gap-8 flex-col">
-		<div class="flex gap-8 items-center">
-			<Avatar src={$userStore?.picture} width="w-12" rounded="rounded-full" />
-			<p>Hello {$userStore.name}!</p>
-		</div>
 		<button
 			class="btn variant-outline"
 			on:click={() => {
-				userStore.logout();
+				auth.logout();
 			}}>Logout</button
 		>
 	</div>
