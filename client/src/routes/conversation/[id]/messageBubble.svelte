@@ -1,13 +1,15 @@
 <script lang="ts">
+	import type { Message } from '$lib/types/message';
+	import { userStore } from '$lib/userStore';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
-	export let message: string;
+	export let message: Message;
 	export let fromHost = false;
 
 	const bubble = {
 		name: 'SenderName',
-		timestamp: '12',
-		message
+		timestamp: message.created_at,
+		message: message.text
 	};
 </script>
 
@@ -31,6 +33,7 @@
 			</header>
 			<p>{bubble.message}</p>
 		</div>
-		<Avatar src="https://i.pravatar.cc/?img=2" width="w-12" />
+
+		<Avatar src={$userStore?.picture} width="w-12" />
 	</div>
 {/if}

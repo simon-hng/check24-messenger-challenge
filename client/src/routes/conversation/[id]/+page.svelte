@@ -2,25 +2,27 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
+	import type { Message } from '$lib/types/message';
 	import axios from 'axios';
 
 	export let data;
 
-	let currentMessage = '';
-	let messages: any[] = [];
+	let currentMessageText = '';
+	let messages: Message[] = [];
 
-	const sendHandler = () => {
-		axios.post('/message/', {
-			data: {
-				message_type: 'stadard',
-				text: currentMessage,
+	const sendHandler = async () => {
+		let message = await axios
+			.post('/message/', {
+				message_type: 'Standard',
+				text: currentMessageText,
 				sender_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
 				recipient_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
 				conversation_id: '596d2176-ce04-47f3-8f9c-60a02e7e7e72'
-			}
-		});
-		messages = [...messages, currentMessage];
-		currentMessage = '';
+			})
+			.then((res) => res.data);
+
+		messages = [...messages, message];
+		currentMessageText = '';
 	};
 </script>
 
@@ -59,7 +61,7 @@
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
 			<button class="input-group-shim">+</button>
 			<textarea
-				bind:value={currentMessage}
+				bind:value={currentMessageText}
 				class="bg-transparent border-0 ring-0 p-2 resize-none"
 				name="prompt"
 				id="prompt"
