@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import { createForm } from 'svelte-forms-lib';
-	import type { userStore } from '$lib/userStore';
+	import { userStore } from '$lib/userStore';
+	import { notificationStore } from '$lib/notificationStore';
 
-	let auth = getContext<typeof userStore>('auth');
 	const { form, handleChange, handleSubmit } = createForm({
 		initialValues: {
 			username: ''
 		},
 
 		onSubmit: async (values) => {
-			await auth.login(values.username);
+			await userStore.login(values.username);
+			notificationStore?.login();
 		}
 	});
 </script>
 
-{#if $auth}
+{#if $userStore}
 	<div class="m-8 flex gap-8 flex-col">
 		<button
 			class="btn variant-outline"
 			on:click={() => {
-				auth.logout();
+				userStore.logout();
 			}}>Logout</button
 		>
 	</div>

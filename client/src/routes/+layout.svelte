@@ -3,7 +3,6 @@
 	import axios from 'axios';
 	import { browser } from '$app/environment';
 	import { QueryClientProvider, QueryClient } from '@tanstack/svelte-query';
-	import { setContext } from 'svelte';
 	import { userStore } from '$lib/userStore';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
@@ -17,8 +16,6 @@
 			}
 		}
 	});
-
-	setContext('auth', userStore);
 </script>
 
 <QueryClientProvider client={queryClient}>

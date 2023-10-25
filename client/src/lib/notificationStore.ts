@@ -1,7 +1,7 @@
 import { get, writable } from 'svelte/store';
 import { userStore } from './userStore';
 
-function createNotificationStore() {
+const createNotificationStore = () => {
 	const user = get(userStore);
 
 	if (!user) {
@@ -12,17 +12,19 @@ function createNotificationStore() {
 
 	const socket = new WebSocket('ws://localhost:8080/message/ws');
 
-	socket.onopen = () => {
-		socket.send(JSON.stringify({ type: 'Auth', id: user.name }));
-	};
 	socket.onmessage = (event) => {
 		update((messages) => [...messages, event.data]);
 	};
 
+	const login = () => {
+		socket.send(JSON.stringify({ type: 'Auth', id: user.name }));
+	};
+
 	return {
 		subscribe,
+		login,
 		close: () => socket.close()
 	};
-}
+};
 
-export const notificationService = createNotificationStore();
+export const notificationStore = createNotificationStore();
