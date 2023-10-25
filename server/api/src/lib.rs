@@ -1,3 +1,4 @@
+use crate::resource::notification;
 use actix::Actor;
 use actix_cors::Cors;
 use actix_identity::IdentityMiddleware;
@@ -6,7 +7,7 @@ use actix_web::{cookie::Key, middleware, web, App, HttpServer};
 use dotenvy::dotenv;
 use entity::app::AppState;
 use migration::{Migrator, MigratorTrait};
-use resource::{auth, conversation, message};
+use resource::{auth, conversation};
 use sea_orm::Database;
 use service::server;
 use std::env;
@@ -59,7 +60,7 @@ pub async fn main() -> std::io::Result<()> {
             )
             .configure(auth::init_service)
             .configure(conversation::init_service)
-            .configure(message::init_service)
+            .configure(notification::init_service)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
