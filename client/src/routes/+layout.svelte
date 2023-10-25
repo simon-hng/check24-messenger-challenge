@@ -6,9 +6,6 @@
 	import { userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
-	axios.defaults.baseURL = 'http://localhost:8080';
-	axios.defaults.withCredentials = true;
-
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {

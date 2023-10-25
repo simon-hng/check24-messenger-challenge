@@ -3,13 +3,13 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { createQuery } from '@tanstack/svelte-query';
 	import type { Chat } from './types';
-	import axios from 'axios';
 	import ChatRow from './chatRow.svelte';
 	import { userStore } from '$lib/stores';
+	import { api } from '$lib/api';
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],
-		queryFn: async () => await axios.get('/conversation/').then((res) => res.data)
+		queryFn: async () => await api.get('/conversation/').then((res) => res.data)
 	});
 </script>
 
