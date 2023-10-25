@@ -5,7 +5,7 @@
 	import type { Chat } from './types';
 	import axios from 'axios';
 	import ChatRow from './chatRow.svelte';
-	import { userStore } from '$lib/userStore';
+	import { userStore } from '$lib/stores';
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],

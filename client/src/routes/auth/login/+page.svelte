@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createForm } from 'svelte-forms-lib';
-	import { userStore } from '$lib/userStore';
-	import { notificationStore } from '$lib/notificationStore';
+	import { userStore, notificationStore } from '$lib/stores';
 
 	const { form, handleChange, handleSubmit } = createForm({
 		initialValues: {

@@ -1,5 +1,7 @@
-import { writable } from 'svelte/store';
 import axios from 'axios';
+import { localStore } from './localStore';
+import { browser } from '$app/environment';
+import { writable } from 'svelte/store';
 
 export interface User {
 	id: string; // TODO UUID
@@ -9,7 +11,7 @@ export interface User {
 }
 
 const createUserStore = () => {
-	const { subscribe, set } = writable<User | undefined>();
+	const { subscribe, set} = browser ? localStore("auth") : writable();
 
 	const login = async (username: string) => {
 		await axios
@@ -26,6 +28,7 @@ const createUserStore = () => {
 
 	return {
 		subscribe,
+    set,
 		login,
 		logout
 	};

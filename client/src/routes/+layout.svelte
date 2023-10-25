@@ -3,7 +3,7 @@
 	import axios from 'axios';
 	import { browser } from '$app/environment';
 	import { QueryClientProvider, QueryClient } from '@tanstack/svelte-query';
-	import { userStore } from '$lib/userStore';
+	import { userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
 	axios.defaults.baseURL = 'http://localhost:8080';

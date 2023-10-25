@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Message } from '$lib/types/message';
-	import { userStore } from '$lib/userStore';
+	import { userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
 	export let message: Message;
