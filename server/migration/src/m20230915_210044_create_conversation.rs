@@ -92,7 +92,7 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(Conversation::CreatedAt)
                             .date_time()
-                            .default(Expr::current_date())
+                            .default(Expr::current_timestamp())
                             .not_null(),
                     )
                     .to_owned(),
@@ -173,7 +173,7 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(Message::CreatedAt)
                             .date_time()
-                            .default(Expr::current_date())
+                            .default(Expr::current_timestamp())
                             .not_null(),
                     )
                     .col(ColumnDef::new(Message::RecipientId).uuid().not_null())
