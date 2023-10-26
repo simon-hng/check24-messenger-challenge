@@ -45,8 +45,11 @@ async fn login(
 }
 
 #[post("/logout")]
-async fn logout(user: Identity) -> impl Responder {
-    user.logout();
+async fn logout(user: Option<Identity>) -> impl Responder {
+    if let Some(user) = user {
+        user.logout();
+    }
+
     HttpResponse::Ok()
 }
 

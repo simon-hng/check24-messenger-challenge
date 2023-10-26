@@ -53,13 +53,28 @@ async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<
             _ => error::ErrorInternalServerError(""),
         })?;
 
-    Ok(web::Json(conversations))
+    let mut response: Vec<ConversationDTO> = Vec::new();
+
+    for conversation in conversations.iter() {
+        let participants = Query::find_account_by_conversation(&data.conn, conversation.to_owned())
+            .await
+            .map_err(|err| error::ErrorInternalServerError(err))?;
+
+        response.push(ConversationDTO {
+            conversation: conversation.to_owned(),
+            participants: Some(participants),
+            messages: None,
+        })
+    }
+
+    Ok(web::Json(response))
 }
 
 #[derive(Serialize)]
 struct ConversationDTO {
     conversation: Model,
-    participants: Vec<account::Model>,
+    participants: Option<Vec<account::Model>>,
+    messages: Option<Vec<entity::message::Model>>,
 }
 #[get("/{id}")]
 async fn get_conversation_by_id(
@@ -80,12 +95,17 @@ async fn get_conversation_by_id(
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    let dto = ConversationDTO {
+    let messages = Query::find_messages_by_conversation(&data.conn, conversation.to_owned())
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    let response = ConversationDTO {
         conversation,
-        participants: accounts,
+        participants: Some(accounts),
+        messages: Some(messages),
     };
 
-    Ok(web::Json(dto))
+    Ok(web::Json(response))
 }
 
 pub fn init_service(cfg: &mut web::ServiceConfig) {

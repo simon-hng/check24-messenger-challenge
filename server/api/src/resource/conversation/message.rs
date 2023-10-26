@@ -6,10 +6,7 @@ use sea_orm::prelude::Uuid;
 use service::actor_message::{Notification, NotifyMessage, NotifyRead};
 use service::{server, Mutation, Query};
 
-fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
-    let user = user
-        .ok_or("Not Authenticated")
-        .map_err(|err| error::ErrorUnauthorized(err))?;
+fn get_user_id(user: Identity) -> Result<Uuid, Error> {
     let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
     let user_id = user_id
         .parse()
@@ -24,16 +21,27 @@ pub struct GetMessagesQueryOptions {
 #[get("")]
 async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Result<impl Responder> {
     let conversation_id = path.into_inner();
-    let messages = Query::find_messages_by_conversation_id(&data.conn, conversation_id).await;
 
-    Ok("")
+    let conversation = Query::find_conversation_by_id(&data.conn, conversation_id)
+        .await
+        .map_err(|err| match err {
+            sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
+            _ => error::ErrorInternalServerError(""),
+        })?
+        .ok_or(error::ErrorNotFound("Conversation not found"))?;
+
+    let messages = Query::find_messages_by_conversation(&data.conn, conversation)
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    Ok(web::Json(messages))
 }
 
 #[post("")]
 async fn post_message(
     data: web::Data<AppState>,
     server: web::Data<Addr<server::NotificationServer>>,
-    user: Option<Identity>,
+    user: Identity,
     notification: web::Json<NotifyMessage>,
     path: web::Path<Uuid>,
 ) -> Result<impl Responder> {
@@ -62,7 +70,7 @@ async fn post_message(
 async fn notify_read(
     server: web::Data<Addr<server::NotificationServer>>,
     notification: web::Json<NotifyRead>,
-    user: Option<Identity>,
+    user: Identity,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
     let _user_id = get_user_id(user)?;

@@ -1,10 +1,12 @@
 import { api } from '$lib/api';
 import type { Account } from '$lib/types/account';
 import type { Conversation } from '$lib/types/conversation';
+import type { Message } from '$lib/types/message';
 
 interface ConversationDTO {
 	conversation: Conversation;
 	participants: Account[];
+	messages: Message[];
 }
 
 export async function load({ params }: any) {

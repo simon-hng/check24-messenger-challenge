@@ -12,7 +12,7 @@
 	const partner = data.participants.find((account) => account.id !== $userStore.id);
 
 	let currentMessageText = '';
-	let messages: Message[] = [];
+	let messages: Message[] = data.messages;
 
 	const sendHandler = async () => {
 		let message = await axios
