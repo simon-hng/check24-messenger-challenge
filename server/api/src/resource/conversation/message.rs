@@ -4,7 +4,7 @@ use actix_web::*;
 use entity::app::AppState;
 use sea_orm::prelude::Uuid;
 use service::actor_message::{Notification, NotifyMessage, NotifyRead};
-use service::{server, Mutation};
+use service::{server, Mutation, Query};
 
 fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
     let user = user
@@ -17,12 +17,24 @@ fn get_user_id(user: Option<Identity>) -> Result<Uuid, Error> {
     Ok(user_id)
 }
 
+pub struct GetMessagesQueryOptions {
+    limit: Option<u32>,
+}
+
+#[get("/")]
+async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Result<impl Responder> {
+    let conversation_id = path.into_inner();
+    let messages = Query::find_messages_by_conversation_id(&data.conn, conversation_id).await;
+
+    Ok("")
+}
+
 #[post("/")]
 async fn post_message(
-    server: web::Data<Addr<server::NotificationServer>>,
-    notification: web::Json<NotifyMessage>,
-    user: Option<Identity>,
     data: web::Data<AppState>,
+    server: web::Data<Addr<server::NotificationServer>>,
+    user: Option<Identity>,
+    notification: web::Json<NotifyMessage>,
     path: web::Path<Uuid>,
 ) -> Result<impl Responder> {
     let user_id = get_user_id(user)?;
