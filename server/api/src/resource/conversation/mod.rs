@@ -3,7 +3,7 @@ use crate::AppState;
 use actix_identity::Identity;
 use actix_web::*;
 use entity::active::NewConversation;
-use sea_orm::prelude::{DateTime, Uuid};
+use sea_orm::prelude::Uuid;
 use serde::Serialize;
 use service::{Mutation, Query};
 
@@ -16,7 +16,7 @@ struct ConversationInfo {
     count_unread: i32,
 }
 
-#[post("/")]
+#[post("")]
 async fn create_conversation(
     user: Identity,
     data: web::Data<AppState>,
@@ -35,7 +35,7 @@ async fn create_conversation(
     Ok(HttpResponse::Created().json(db_conversation))
 }
 
-#[get("/")]
+#[get("")]
 async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<impl Responder> {
     let user_id = user
         .id()
@@ -79,15 +79,6 @@ async fn get_conversation_by_id(
         })?;
 
     Ok(web::Json(conversation))
-}
-
-struct GetMessageParams {
-    created_before: Option<DateTime>,
-}
-
-#[get("/{id}/messages")]
-async fn get_messages() -> Result<impl Responder> {
-    Ok("ok")
 }
 
 pub fn init_service(cfg: &mut web::ServiceConfig) {

@@ -21,7 +21,7 @@ pub struct GetMessagesQueryOptions {
     limit: Option<u32>,
 }
 
-#[get("/")]
+#[get("")]
 async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Result<impl Responder> {
     let conversation_id = path.into_inner();
     let messages = Query::find_messages_by_conversation_id(&data.conn, conversation_id).await;
@@ -29,7 +29,7 @@ async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Resul
     Ok("")
 }
 
-#[post("/")]
+#[post("")]
 async fn post_message(
     data: web::Data<AppState>,
     server: web::Data<Addr<server::NotificationServer>>,
@@ -58,7 +58,7 @@ async fn post_message(
     Ok(HttpResponse::Created().json(db_msg))
 }
 
-#[post("/notify_read/")]
+#[post("/notify_read")]
 async fn notify_read(
     server: web::Data<Addr<server::NotificationServer>>,
     notification: web::Json<NotifyRead>,
