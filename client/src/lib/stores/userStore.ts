@@ -1,34 +1,28 @@
-import axios from 'axios';
 import { localStore } from './localStore';
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-
-export interface User {
-	id: string; // TODO UUID
-	name: string;
-	picture: string;
-	account_type: 'Customer' | 'ServiceProvider';
-}
+import { api } from '$lib/api';
+import type { Account } from '$lib/types/account';
 
 const createUserStore = () => {
-	const { subscribe, set} = browser ? localStore("auth") : writable();
+	const { subscribe, set } = browser ? localStore('auth') : writable();
 
 	const login = async (username: string) => {
-		await axios
+		await api
 			.post('/auth/login', {
 				account_name: username
 			})
-			.then((res) => set(res.data))
+			.then((res) => set(res.data as Account))
 			.catch((err) => console.error(err));
 	};
 
 	const logout = async () => {
-		await axios.post('/auth/logout').then(() => set(undefined));
+		await api.post('/auth/logout').then(() => set(undefined));
 	};
 
 	return {
 		subscribe,
-    set,
+		set,
 		login,
 		logout
 	};

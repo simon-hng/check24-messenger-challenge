@@ -9,7 +9,7 @@
 
 	const query = createQuery<Chat[], Error>({
 		queryKey: ['conversations'],
-		queryFn: async () => await api.get('/conversation/').then((res) => res.data)
+		queryFn: async () => await api.get('/conversation').then((res) => res.data)
 	});
 </script>
 

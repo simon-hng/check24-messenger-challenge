@@ -4,8 +4,12 @@
 	import MessageBubble from './messageBubble.svelte';
 	import type { Message } from '$lib/types/message';
 	import axios from 'axios';
+	import { userStore } from '$lib/stores';
 
 	export let data;
+
+	const conversation = data.conversation;
+	const partner = data.participants.find((account) => account.id !== $userStore.id);
 
 	let currentMessageText = '';
 	let messages: Message[] = [];
@@ -35,13 +39,13 @@
 		</a>
 		<div class="flex flex-row gap-2">
 			<Avatar
-				src="https://i.pravatar.cc/?img=1"
+				src={partner?.picture}
 				width="w-12 h-12"
 				rounded="rounded-full"
 				class="flex-shrink-0"
 			/>
 			<div>
-				<h2 class="font-semibold text-xl">{data.id} {data.state} {data.created_at.toString()}</h2>
+				<h2 class="font-semibold text-xl">{partner?.name}</h2>
 				<p class="text-sm">online</p>
 			</div>
 		</div>

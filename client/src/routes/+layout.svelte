@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../app.css';
-	import axios from 'axios';
 	import { browser } from '$app/environment';
 	import { QueryClientProvider, QueryClient } from '@tanstack/svelte-query';
 	import { userStore } from '$lib/stores';

@@ -2,7 +2,9 @@ mod message;
 use crate::AppState;
 use actix_identity::Identity;
 use actix_web::*;
+use entity::account;
 use entity::active::NewConversation;
+use entity::conversation::Model;
 use sea_orm::prelude::Uuid;
 use serde::Serialize;
 use service::{Mutation, Query};
@@ -55,30 +57,35 @@ async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<
 }
 
 #[derive(Serialize)]
-struct ConversationDetail {
-    id: i32,
-    name: String,
-    last_message: Option<String>,
-    updated_at: chrono::NaiveDateTime,
-    count_unread: i32,
+struct ConversationDTO {
+    conversation: Model,
+    participants: Vec<account::Model>,
 }
-
 #[get("/{id}")]
 async fn get_conversation_by_id(
-    path: web::Path<String>,
+    path: web::Path<Uuid>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
-    let conversation_id = path.into_inner().parse().unwrap();
+    let conversation_id = path.into_inner();
 
     let conversation = Query::find_conversation_by_id(&data.conn, conversation_id)
         .await
         .map_err(|err| match err {
             sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
-            sea_orm::DbErr::RecordNotFound(message) => error::ErrorNotFound(message),
             _ => error::ErrorInternalServerError(""),
-        })?;
+        })?
+        .ok_or(error::ErrorNotFound("Conversation not found"))?;
 
-    Ok(web::Json(conversation))
+    let accounts = Query::find_account_by_conversation(&data.conn, conversation.to_owned())
+        .await
+        .map_err(|err| error::ErrorInternalServerError(err))?;
+
+    let dto = ConversationDTO {
+        conversation,
+        participants: accounts,
+    };
+
+    Ok(web::Json(dto))
 }
 
 pub fn init_service(cfg: &mut web::ServiceConfig) {

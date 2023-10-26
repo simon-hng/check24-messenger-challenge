@@ -1,5 +1,5 @@
 use crate::Query;
-use ::entity::{account, prelude::Account};
+use ::entity::{account, conversation, prelude::Account};
 use sea_orm::prelude::Uuid;
 use sea_orm::*;
 
@@ -19,5 +19,12 @@ impl Query {
             .filter(account::Column::Name.eq(&account_name))
             .one(db)
             .await
+    }
+
+    pub async fn find_account_by_conversation(
+        db: &DbConn,
+        conversation: conversation::Model,
+    ) -> Result<Vec<account::Model>, DbErr> {
+        conversation.find_related(Account).all(db).await
     }
 }
