@@ -3,21 +3,21 @@
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import { api } from '$lib/api';
+	import { userStore } from '$lib/stores';
 
 	export let data;
 
 	let { conversation, partner, messages } = data;
-
 	let currentMessageText = '';
 
 	const sendHandler = async () => {
 		let message = await api
-			.post('/message/', {
+			.post(`conversation/${conversation.id}/message`, {
 				message_type: 'Standard',
 				text: currentMessageText,
-				sender_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
-				recipient_id: '2f11b93a-fa03-4ca6-85e8-d8cc8f9db6b8',
-				conversation_id: '596d2176-ce04-47f3-8f9c-60a02e7e7e72'
+				sender_id: $userStore.id,
+				recipient_id: partner.id,
+				conversation_id: conversation.id
 			})
 			.then((res) => res.data);
 

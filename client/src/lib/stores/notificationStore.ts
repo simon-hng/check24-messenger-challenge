@@ -1,28 +1,26 @@
 import { get, writable } from 'svelte/store';
 import { userStore } from './userStore';
+import { browser } from '$app/environment';
 
 const createNotificationStore = () => {
 	const user = get(userStore);
-
-	if (!user) {
-		return;
-	}
-
 	const { subscribe, update } = writable<any[]>([]);
 
-	const socket = new WebSocket('ws://localhost:8080/message/ws');
+	let socket: WebSocket;
 
-	socket.onmessage = (event) => {
-		update((messages) => [...messages, event.data]);
-	};
+	if (browser) {
+		socket = new WebSocket('ws://localhost:8080/notifications/ws');
 
-	const login = () => {
-		socket.send(JSON.stringify({ type: 'Auth', id: user.name }));
-	};
+		socket.onopen = () => {
+			socket.send(JSON.stringify({ type: 'Auth', id: user?.name }));
+		};
+		socket.onmessage = (event) => {
+			update((notifications) => [...notifications, event.data]);
+		};
+	}
 
 	return {
 		subscribe,
-		login,
 		close: () => socket.close()
 	};
 };

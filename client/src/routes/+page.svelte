@@ -4,7 +4,6 @@
 </svelte:head>
 
 <section>
-	<h1 class="text-center mt-32 text-4xl font-serif">
-		Aller Anfang ist schwer. Anfangen ist einfach, Beharrlichkeit eine Kunst
-	</h1>
+	<a href="conversation">Conversations</a>
+	<a href="auth/login">login</a>
 </section>
