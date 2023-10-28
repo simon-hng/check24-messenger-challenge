@@ -51,7 +51,7 @@
 		<div class="mx-8 flex flex-col gap-4">
 			{#if messages.length}
 				{#each messages as message}
-					<MessageBubble {message} />
+					<MessageBubble {message} {partner} />
 				{/each}
 			{/if}
 		</div>

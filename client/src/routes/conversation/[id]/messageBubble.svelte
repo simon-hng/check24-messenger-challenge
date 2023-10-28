@@ -1,37 +1,31 @@
 <script lang="ts">
-	import type { Message } from '$lib/types';
+	import type { Account, Message } from '$lib/types';
 	import { userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
 
 	export let message: Message;
-	export let fromHost = false;
-
-	const bubble = {
-		name: 'SenderName',
-		timestamp: message.created_at,
-		message: message.text
-	};
+	export let partner: Account;
 </script>
 
-{#if fromHost}
+{#if message.sender_id !== $userStore.id}
 	<div class="grid grid-cols-[auto_1fr] gap-2">
-		<Avatar src="https://i.pravatar.cc/?img=1" width="w-12" />
+		<Avatar src={partner.picture} width="w-12" />
 		<div class="card p-4 variant-soft rounded-tl-none space-y-2">
 			<header class="flex justify-between items-center">
-				<p class="font-bold">{bubble.name}</p>
-				<small class="opacity-50">{bubble.timestamp}</small>
+				<p class="font-bold">{partner.name}</p>
+				<small class="opacity-50">{message.created_at}</small>
 			</header>
-			<p>{bubble.message}</p>
+			<p>{message.text}</p>
 		</div>
 	</div>
 {:else}
 	<div class="grid grid-cols-[1fr_auto] gap-2">
 		<div class="card p-4 rounded-tr-none space-y-2 bg-primary-200-700-token">
 			<header class="flex justify-between items-center">
-				<p class="font-bold">{bubble.name}</p>
-				<small class="opacity-50">{bubble.timestamp}</small>
+				<p class="font-bold">{$userStore.name}</p>
+				<small class="opacity-50">{message.created_at}</small>
 			</header>
-			<p>{bubble.message}</p>
+			<p>{message.text}</p>
 		</div>
 
 		<Avatar src={$userStore?.picture} width="w-12" />
