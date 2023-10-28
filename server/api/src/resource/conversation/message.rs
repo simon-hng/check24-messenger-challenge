@@ -1,3 +1,4 @@
+use crate::resource::auth::get_user_id;
 use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
@@ -5,14 +6,6 @@ use entity::app::AppState;
 use sea_orm::prelude::Uuid;
 use service::actor_message::{Notification, NotifyMessage, NotifyRead};
 use service::{server, Mutation, Query};
-
-fn get_user_id(user: Identity) -> Result<Uuid, Error> {
-    let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
-    let user_id = user_id
-        .parse()
-        .map_err(|err| error::ErrorUnauthorized(err))?;
-    Ok(user_id)
-}
 
 pub struct GetMessagesQueryOptions {
     limit: Option<u32>,

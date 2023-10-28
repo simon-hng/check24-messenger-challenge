@@ -1,10 +1,21 @@
 use actix_identity::Identity;
 
-use actix_web::{error, get, post, web, HttpMessage, HttpRequest, HttpResponse, Responder, Result};
+use actix_web::{
+    error, get, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder, Result,
+};
+use sea_orm::prelude::Uuid;
 use serde::Deserialize;
 use service::Query;
 
 use crate::AppState;
+
+pub fn get_user_id(user: Identity) -> Result<Uuid, Error> {
+    let user_id = user.id().map_err(|err| error::ErrorUnauthorized(err))?;
+    let user_id = user_id
+        .parse()
+        .map_err(|err| error::ErrorUnauthorized(err))?;
+    Ok(user_id)
+}
 
 #[get("/whoami")]
 async fn whoami(user: Option<Identity>) -> Result<impl Responder> {

@@ -1,16 +1,13 @@
-import type { Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 const authorization: Handle = async ({ event, resolve }) => {
-	/*
-    * TODO: Check cookie
-	if (event.url.pathname.startsWith('/conversation')) {
-		const session = await event.locals.getSession();
+	if (!event.url.pathname.startsWith('/auth/login')) {
+		const session = event.cookies.get('id');
 		if (!session) {
-			throw redirect(303, '/auth');
+			throw redirect(303, '/auth/login');
 		}
 	}
-  */
 
 	return resolve(event);
 };

@@ -1,10 +1,10 @@
 mod message;
+
+use crate::resource::auth::get_user_id;
 use crate::AppState;
 use actix_identity::Identity;
 use actix_web::*;
-use entity::account;
 use entity::active::NewConversation;
-use entity::conversation::Model;
 use sea_orm::prelude::Uuid;
 use serde::Serialize;
 use service::{Mutation, Query};
@@ -45,65 +45,26 @@ async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<
         .parse()
         .map_err(|err| error::ErrorUnauthorized(err))?;
 
-    let conversations = Query::find_conversation_by_account_id(&data.conn, user_id)
+    let response = Query::get_conversation_dtos_by_account_id(&data.conn, user_id)
         .await
-        .map_err(|err| match err {
-            sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
-            sea_orm::DbErr::RecordNotFound(message) => error::ErrorNotFound(message),
-            _ => error::ErrorInternalServerError(""),
-        })?;
-
-    let mut response: Vec<ConversationDTO> = Vec::new();
-
-    for conversation in conversations.iter() {
-        let participants = Query::find_account_by_conversation(&data.conn, conversation.to_owned())
-            .await
-            .map_err(|err| error::ErrorInternalServerError(err))?;
-
-        response.push(ConversationDTO {
-            conversation: conversation.to_owned(),
-            participants: Some(participants),
-            messages: None,
-        })
-    }
+        .map_err(|err| error::ErrorInternalServerError(err))?;
 
     Ok(web::Json(response))
 }
 
-#[derive(Serialize)]
-struct ConversationDTO {
-    conversation: Model,
-    participants: Option<Vec<account::Model>>,
-    messages: Option<Vec<entity::message::Model>>,
-}
 #[get("/{id}")]
 async fn get_conversation_by_id(
+    user: Identity,
     path: web::Path<Uuid>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder> {
+    let account_id = get_user_id(user)?;
+
     let conversation_id = path.into_inner();
 
-    let conversation = Query::find_conversation_by_id(&data.conn, conversation_id)
-        .await
-        .map_err(|err| match err {
-            sea_orm::DbErr::Conn(message) => error::ErrorServiceUnavailable(message),
-            _ => error::ErrorInternalServerError(""),
-        })?
-        .ok_or(error::ErrorNotFound("Conversation not found"))?;
-
-    let accounts = Query::find_account_by_conversation(&data.conn, conversation.to_owned())
+    let response = Query::get_conversation_dto(&data.conn, conversation_id, account_id)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
-
-    let messages = Query::find_messages_by_conversation(&data.conn, conversation.to_owned())
-        .await
-        .map_err(|err| error::ErrorInternalServerError(err))?;
-
-    let response = ConversationDTO {
-        conversation,
-        participants: Some(accounts),
-        messages: Some(messages),
-    };
 
     Ok(web::Json(response))
 }

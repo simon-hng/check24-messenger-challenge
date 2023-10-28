@@ -2,20 +2,16 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
-	import type { Message } from '$lib/types/message';
-	import axios from 'axios';
-	import { userStore } from '$lib/stores';
+	import { api } from '$lib/api';
 
 	export let data;
 
-	const conversation = data.conversation;
-	const partner = data.participants.find((account) => account.id !== $userStore.id);
+	let { conversation, partner, messages } = data;
 
 	let currentMessageText = '';
-	let messages: Message[] = data.messages;
 
 	const sendHandler = async () => {
-		let message = await axios
+		let message = await api
 			.post('/message/', {
 				message_type: 'Standard',
 				text: currentMessageText,

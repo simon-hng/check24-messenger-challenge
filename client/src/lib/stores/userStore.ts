@@ -2,7 +2,7 @@ import { localStore } from './localStore';
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { api } from '$lib/api';
-import type { Account } from '$lib/types/account';
+import type { Account } from '$lib/types';
 
 const createUserStore = () => {
 	const { subscribe, set } = browser ? localStore('auth') : writable();

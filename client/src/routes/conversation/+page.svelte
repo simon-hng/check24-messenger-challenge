@@ -1,16 +1,8 @@
 <script lang="ts">
-	import { faker } from '@faker-js/faker';
 	import { Avatar } from '@skeletonlabs/skeleton';
-	import { createQuery } from '@tanstack/svelte-query';
-	import type { Chat } from './types';
-	import ChatRow from './chatRow.svelte';
 	import { userStore } from '$lib/stores';
-	import { api } from '$lib/api';
-
-	const query = createQuery<Chat[], Error>({
-		queryKey: ['conversations'],
-		queryFn: async () => await api.get('/conversation').then((res) => res.data)
-	});
+	import { conversationStore } from '$lib/stores/conversationStore';
+	import ChatRow from './chatRow.svelte';
 </script>
 
 <div class="h-screen">
@@ -25,29 +17,9 @@
 
 	<section>
 		<ul class="list p-2">
-			{#if $query.isLoading}
-				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
-				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
-				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
-			{:else if $query.error}
-				error happened
-				{$query.error}
-			{:else if $query.isSuccess}
-				{#each $query.data as chat}
-					<ChatRow
-						chat={{
-							id: chat.id,
-							avatar: faker.image.avatar(),
-							name: chat.name,
-							last_message: faker.lorem.text(),
-							updated_at: chat.updated_at,
-							count_unread: chat.count_unread
-						}}
-					/>
-				{/each}
-			{:else}
-				????
-			{/if}
+			{#each $conversationStore as conversationDTO}
+				<ChatRow {conversationDTO} />
+			{/each}
 		</ul>
 	</section>
 </div>

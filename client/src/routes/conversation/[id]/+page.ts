@@ -1,20 +1,11 @@
 import { api } from '$lib/api';
-import type { Account } from '$lib/types/account';
-import type { Conversation } from '$lib/types/conversation';
-import type { Message } from '$lib/types/message';
+import type { ConversationDTO } from '$lib/types';
+import type { PageLoad } from './$types';
 
-interface ConversationDTO {
-	conversation: Conversation;
-	participants: Account[];
-	messages: Message[];
-}
+export const load: PageLoad = ({ params }) => {
+	const { id } = params;
 
-export async function load({ params }: any) {
-	const conversationId = params.id;
+	const conversationDTO = api.get(`/conversation/${id}`).then((res) => res.data as ConversationDTO);
 
-	const conversation = await api
-		.get(`/conversation/${conversationId}`)
-		.then((res) => res.data as ConversationDTO);
-
-	return conversation;
-}
+	return conversationDTO;
+};
