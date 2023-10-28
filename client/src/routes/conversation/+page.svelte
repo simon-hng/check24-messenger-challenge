@@ -1,8 +1,15 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { userStore } from '$lib/stores';
-	import { conversationStore } from '$lib/stores/conversationStore';
 	import ChatRow from './chatRow.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { api } from '$lib/api';
+	import type { ConversationDTO } from '$lib/types';
+
+	const query = createQuery<ConversationDTO[], Error>({
+		queryKey: ['conversations'],
+		queryFn: async () => await api.get('conversation').then((res) => res.data)
+	});
 </script>
 
 <div class="h-screen">
@@ -17,9 +24,15 @@
 
 	<section>
 		<ul class="list p-2">
-			{#each $conversationStore as conversationDTO}
-				<ChatRow {conversationDTO} />
-			{/each}
+			{#if $query.isLoading}
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
+				<div class="w-full h-16 placeholder animate-pulse rounded-xl" />
+			{:else if $query.isSuccess}
+				{#each $query.data as conversationDTO}
+					<ChatRow {conversationDTO} />
+				{/each}
+			{/if}
 		</ul>
 	</section>
 </div>
