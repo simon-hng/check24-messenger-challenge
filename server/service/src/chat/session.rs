@@ -3,6 +3,7 @@ use crate::chat::actor_message::Notification;
 use actix::prelude::*;
 use actix_web_actors::ws;
 use sea_orm::prelude::Uuid;
+use serde_json::json;
 use std::time::Instant;
 
 use super::server;
@@ -55,6 +56,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsNotifierSession
                             });
 
                             self.account_id = Some(id);
+                            let response = json!({
+                                "type": "Confirm_auth",
+                                "id": id,
+                            });
+                            ctx.text(serde_json::to_string(&response).unwrap());
                         }
 
                         return;

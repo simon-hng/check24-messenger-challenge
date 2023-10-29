@@ -3,7 +3,7 @@
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import { api } from '$lib/api';
-	import { userStore } from '$lib/stores';
+	import { userStore, notificationStore } from '$lib/stores';
 
 	export let data;
 
@@ -24,6 +24,13 @@
 		messages = [...messages, message];
 		currentMessageText = '';
 	};
+
+	$: {
+		console.log($notificationStore);
+		if ($notificationStore?.type === 'Message') {
+			messages = [...(messages ?? []), $notificationStore];
+		}
+	}
 </script>
 
 <div class="grid grid-rows-[auto_1fr_auto] h-screen">
@@ -49,7 +56,7 @@
 
 	<div class="overflow-y-auto">
 		<div class="mx-8 flex flex-col gap-4">
-			{#if messages.length}
+			{#if messages?.length}
 				{#each messages as message}
 					<MessageBubble {message} {partner} />
 				{/each}
