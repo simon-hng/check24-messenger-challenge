@@ -7,7 +7,14 @@ type Notification =
 	| ({
 			type: 'Message';
 	  } & Message)
-	| { type: 'Confirm_auth'; id: string };
+	| { type: 'Confirm_auth'; id: string }
+	| ({ type: 'Read' } & NotificationRead);
+
+type NotificationRead = {
+	message_id: string;
+	read_at: Date;
+	sender_id: string;
+};
 
 const createNotificationStore = () => {
 	const user = get(userStore);

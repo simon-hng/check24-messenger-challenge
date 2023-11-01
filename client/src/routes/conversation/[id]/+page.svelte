@@ -27,8 +27,25 @@
 	};
 
 	const unsubscribe = notificationStore.subscribe((notification) => {
-		if (notification?.type === 'Message') {
-			messages = [...(messages ?? []), notification];
+		switch (notification?.type) {
+			case 'Message': {
+				messages = [...(messages ?? []), notification];
+				return;
+			}
+			case 'Read': {
+				messages = messages.map((message) => {
+					if (message.id === notification.message_id) {
+						return { ...message, read_at: notification.read_at };
+					}
+					return message;
+				});
+
+				return;
+			}
+			case 'Confirm_auth': {
+				console.log('authenticated ');
+				return;
+			}
 		}
 	});
 
@@ -52,9 +69,11 @@
 	};
 
 	let loadingPrevious: Promise<any>;
+	/*
 	$: if (scrollY === 0 && messages.length) {
 		loadingPrevious = loadPreviousMessages();
 	}
+  */
 </script>
 
 <svelte:window bind:scrollY bind:innerHeight bind:outerHeight />
