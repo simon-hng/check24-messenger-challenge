@@ -2,6 +2,7 @@
 	import type { Account, Message } from '$lib/types';
 	import { userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
+	import { formatDate } from '$lib/util/date';
 
 	export let message: Message;
 	export let partner: Account;
@@ -13,7 +14,7 @@
 		<div class="card p-4 variant-soft rounded-tl-none space-y-2">
 			<header class="flex justify-between items-center">
 				<p class="font-bold">{partner.name}</p>
-				<small class="opacity-50">{message.created_at}</small>
+				<small class="opacity-50">{formatDate(message.created_at)}</small>
 			</header>
 			<p>{message.text}</p>
 		</div>
@@ -23,7 +24,7 @@
 		<div class="card p-4 rounded-tr-none space-y-2 bg-primary-200-700-token">
 			<header class="flex justify-between items-center">
 				<p class="font-bold">{$userStore.name}</p>
-				<small class="opacity-50">{message.created_at}</small>
+				<small class="opacity-50">{formatDate(message.created_at)}</small>
 			</header>
 			<p>{message.text}</p>
 		</div>

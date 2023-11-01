@@ -3,6 +3,7 @@
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import CheckIcon from '$lib/icons/checkIcon.svelte';
 	import { userStore } from '$lib/stores';
+	import { formatDate } from '$lib/util/date';
 
 	export let conversationDTO: ConversationDTO;
 	let { conversation, partner, messages } = conversationDTO;
@@ -30,7 +31,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-col items-end gap-1 ml-auto">
-			<p class="text-sm whitespace-nowrap">{last_message.created_at}</p>
+			<p class="text-sm whitespace-nowrap">{formatDate(last_message.created_at)}</p>
 			{#if messages}
 				<span class="badge bg-primary-500">2</span>
 			{/if}
