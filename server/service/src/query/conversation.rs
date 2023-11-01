@@ -40,7 +40,7 @@ impl Query {
             db,
             conversation.to_owned(),
             Some(::entity::api::message_api::MessageQueryParams {
-                limit: Some(5),
+                limit: Some(10),
                 before: None,
             }),
         )

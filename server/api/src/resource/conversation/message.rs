@@ -89,6 +89,7 @@ async fn notify_read(
 pub fn init_service(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/message")
+            .service(get_messages)
             .service(post_message)
             .service(notify_read),
     );

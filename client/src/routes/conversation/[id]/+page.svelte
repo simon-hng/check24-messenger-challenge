@@ -33,40 +33,67 @@
 	});
 
 	onDestroy(unsubscribe);
+
+	let scrollY: number;
+	let innerHeight: number;
+	let outerHeight: number;
+
+	const loadPreviousMessages = async () => {
+		const previous = await api
+			.get(`conversation/${conversation.id}/message`, {
+				params: {
+					limit: 10,
+					before: messages[0].created_at
+				}
+			})
+			.then((res) => res.data);
+
+		messages = [...previous, ...messages];
+	};
+
+	let loadingPrevious: Promise<any>;
+	$: if (scrollY === 0 && messages.length) {
+		loadingPrevious = loadPreviousMessages();
+	}
 </script>
 
-<div class="grid grid-rows-[auto_1fr_auto] h-screen">
-	<div
-		class="rounded-b-2xl p-4 flex flex-row items-center gap-3 top-0 left-0 w-full bg-surface-100-800-token mb-8"
-	>
-		<a href="/conversation" class="bg-surface-hover-token p-2 rounded-full duration-300">
-			<Icon src={ArrowLeft} size="24" />
-		</a>
-		<div class="flex flex-row gap-2">
-			<Avatar
-				src={partner?.picture}
-				width="w-12 h-12"
-				rounded="rounded-full"
-				class="flex-shrink-0"
-			/>
-			<div>
-				<h2 class="font-semibold text-xl">{partner?.name}</h2>
-				<p class="text-sm">online</p>
+<svelte:window bind:scrollY bind:innerHeight bind:outerHeight />
+
+<div class="h-screen">
+	<div class="top-0 fixed w-full z-10">
+		<div class="rounded-b-2xl w-full p-4 flex flex-row items-center gap-3 bg-surface-100-800-token">
+			<a href="/conversation" class="bg-surface-hover-token p-2 rounded-full duration-300">
+				<Icon src={ArrowLeft} size="24" />
+			</a>
+			<div class="flex flex-row gap-2">
+				<Avatar
+					src={partner?.picture}
+					width="w-12 h-12"
+					rounded="rounded-full"
+					class="flex-shrink-0"
+				/>
+				<div>
+					<h2 class="font-semibold text-xl">{partner?.name}</h2>
+					<p class="text-sm">online</p>
+				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="overflow-y-auto">
-		<div class="mx-8 flex flex-col gap-4">
-			{#if messages?.length}
-				{#each messages as message}
-					<MessageBubble {message} {partner} />
-				{/each}
-			{/if}
-		</div>
+	<div class="mx-8 py-32 flex flex-col gap-4">
+		{#if messages?.length}
+			{#await loadingPrevious}
+				loading
+			{:then}
+				<button on:click={loadPreviousMessages}>Load more</button>
+			{/await}
+			{#each messages as message}
+				<MessageBubble {message} {partner} />
+			{/each}
+		{/if}
 	</div>
 
-	<div class="m-8">
+	<div class="fixed bottom-0 w-full px-8 py-6">
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
 			<button class="input-group-shim">+</button>
 			<textarea
