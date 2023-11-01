@@ -7,12 +7,12 @@ use sea_orm::prelude::Uuid;
 use service::actor_message::{Notification, NotifyMessage, NotifyRead};
 use service::{server, Mutation, Query};
 
-pub struct GetMessagesQueryOptions {
-    limit: Option<u32>,
-}
-
 #[get("")]
-async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Result<impl Responder> {
+async fn get_messages(
+    data: web::Data<AppState>,
+    path: web::Path<Uuid>,
+    query: web::Query<entity::api::message_api::MessageQueryParams>,
+) -> Result<impl Responder> {
     let conversation_id = path.into_inner();
 
     let conversation = Query::find_conversation_by_id(&data.conn, conversation_id)
@@ -23,7 +23,10 @@ async fn get_messages(data: web::Data<AppState>, path: web::Path<Uuid>) -> Resul
         })?
         .ok_or(error::ErrorNotFound("Conversation not found"))?;
 
-    let messages = Query::find_messages_by_conversation(&data.conn, conversation)
+    let params: Option<entity::api::message_api::MessageQueryParams> =
+        query.into_inner().try_into().ok();
+
+    let messages = Query::find_messages_by_conversation(&data.conn, conversation, params)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
@@ -59,16 +62,17 @@ async fn post_message(
     Ok(HttpResponse::Created().json(db_msg))
 }
 
-#[post("/notify_read")]
+#[post("/{message_id}/read")]
 async fn notify_read(
     server: web::Data<Addr<server::NotificationServer>>,
-    notification: web::Json<NotifyRead>,
     user: Identity,
     data: web::Data<AppState>,
+    path: web::Path<(Uuid, Uuid)>,
 ) -> Result<impl Responder> {
     let _user_id = get_user_id(user)?;
-    let notification = notification.into_inner();
-    let db_msg = Mutation::update_message_read(&data.conn, notification)
+    let (_conversation_id, message_id) = path.into_inner();
+
+    let db_msg = Mutation::update_message_read(&data.conn, message_id)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
@@ -83,5 +87,9 @@ async fn notify_read(
 }
 
 pub fn init_service(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/message").service(post_message));
+    cfg.service(
+        web::scope("/message")
+            .service(post_message)
+            .service(notify_read),
+    );
 }

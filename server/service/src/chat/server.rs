@@ -56,7 +56,10 @@ impl Handler<Notification> for NotificationServer {
         let recipient_id = match msg {
             Notification::Message(NotifyMessage { recipient_id, .. }) => recipient_id,
             Notification::Received(NotifyReceived { recipient_id, .. }) => recipient_id,
-            Notification::Read(NotifyRead { recipient_id, .. }) => recipient_id,
+            Notification::Read(NotifyRead {
+                sender_id: recipient_id,
+                ..
+            }) => recipient_id,
             _ => {
                 panic!("This should not happen")
             }

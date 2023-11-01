@@ -6,17 +6,7 @@ use actix_identity::Identity;
 use actix_web::*;
 use entity::active::NewConversation;
 use sea_orm::prelude::Uuid;
-use serde::Serialize;
 use service::{Mutation, Query};
-
-#[derive(Serialize)]
-struct ConversationInfo {
-    id: i32,
-    name: String,
-    last_message: Option<String>,
-    updated_at: chrono::NaiveDateTime,
-    count_unread: i32,
-}
 
 #[post("")]
 async fn create_conversation(
@@ -45,7 +35,7 @@ async fn get_conversations(user: Identity, data: web::Data<AppState>) -> Result<
         .parse()
         .map_err(|err| error::ErrorUnauthorized(err))?;
 
-    let response = Query::get_conversation_dtos_by_account_id(&data.conn, user_id)
+    let response = Query::get_conversation_dtos(&data.conn, user_id)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 

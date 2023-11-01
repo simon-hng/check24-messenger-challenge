@@ -1,8 +1,10 @@
-use crate::actor_message::{NotifyMessage, NotifyRead};
+use crate::actor_message::NotifyMessage;
 use crate::Mutation;
+use chrono::Utc;
 use entity::message;
 use entity::message::Model;
 use entity::prelude::Message;
+use sea_orm::prelude::Uuid;
 use sea_orm::{ActiveModelTrait, DbConn, DbErr, EntityTrait, Set};
 
 impl Mutation {
@@ -19,11 +21,11 @@ impl Mutation {
         .await
     }
 
-    pub async fn update_message_read(db: &DbConn, notify: NotifyRead) -> Result<Model, DbErr> {
-        let message: Option<Model> = Message::find_by_id(notify.message_id).one(db).await?;
+    pub async fn update_message_read(db: &DbConn, message_id: Uuid) -> Result<Model, DbErr> {
+        let message: Option<Model> = Message::find_by_id(message_id).one(db).await?;
 
         let mut message: message::ActiveModel = message.unwrap().into();
-        message.read_at = Set(Some(notify.read_at));
+        message.read_at = Set(Some(Utc::now().naive_utc()));
 
         message.update(db).await
     }

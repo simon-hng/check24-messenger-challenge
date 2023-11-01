@@ -20,9 +20,9 @@
 		<div class="overflow-hiden">
 			<h3 class="font-semibold text-xl">{partner.name}</h3>
 			{#if last_message}
-				<div class="flex gap-2">
+				<div class="flex gap-2 items-center">
 					{#if last_message.sender_id === $userStore.id}
-						<CheckIcon />
+						<CheckIcon class="w-6 h-6" />
 					{/if}
 					<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
 						{last_message.text ?? ''}

@@ -40,7 +40,7 @@ pub struct NotifyReceived {
 pub struct NotifyRead {
     pub read_at: DateTime,
     pub message_id: Uuid,
-    pub recipient_id: Uuid,
+    pub sender_id: Uuid,
 }
 
 impl From<Model> for NotifyRead {
@@ -48,7 +48,7 @@ impl From<Model> for NotifyRead {
         NotifyRead {
             message_id: value.id,
             read_at: value.read_at.unwrap(),
-            recipient_id: value.recipient_id,
+            sender_id: value.sender_id,
         }
     }
 }
