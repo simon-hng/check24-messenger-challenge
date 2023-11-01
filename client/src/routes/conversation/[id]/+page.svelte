@@ -4,6 +4,7 @@
 	import MessageBubble from './messageBubble.svelte';
 	import { api } from '$lib/api';
 	import { userStore, notificationStore } from '$lib/stores';
+	import { onDestroy } from 'svelte';
 
 	export let data;
 
@@ -25,12 +26,13 @@
 		currentMessageText = '';
 	};
 
-	$: {
-		console.log($notificationStore);
-		if ($notificationStore?.type === 'Message') {
-			messages = [...(messages ?? []), $notificationStore];
+	const unsubscribe = notificationStore.subscribe((notification) => {
+		if (notification?.type === 'Message') {
+			messages = [...(messages ?? []), notification];
 		}
-	}
+	});
+
+	onDestroy(unsubscribe);
 </script>
 
 <div class="grid grid-rows-[auto_1fr_auto] h-screen">
