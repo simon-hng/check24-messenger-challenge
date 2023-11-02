@@ -9,7 +9,6 @@ use entity::app::AppState;
 use migration::{Migrator, MigratorTrait};
 use resource::{auth, conversation};
 use sea_orm::Database;
-use service::server;
 use std::env;
 
 mod resource;
@@ -34,7 +33,7 @@ pub async fn main() -> std::io::Result<()> {
     // set up applications state
     // keep a count of the number of visitors
     let app_state = AppState { conn };
-    let message_server = server::NotificationServer::new(secret_key.clone()).start();
+    let message_server = service::chat::server::NotificationServer::new(secret_key.clone()).start();
 
     let store = RedisSessionStore::new(redis_connection_string)
         .await

@@ -1,7 +1,6 @@
 use crate::Query;
-use ::entity::prelude::{Account, Conversation};
-use sea_orm::prelude::Uuid;
-use sea_orm::*;
+use entity::prelude::*;
+use sea_orm::prelude::*;
 
 impl Query {
     pub async fn find_conversation_by_account_id(

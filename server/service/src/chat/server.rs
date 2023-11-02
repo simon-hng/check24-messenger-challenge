@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use crate::actor_message::{NotifyMessage, NotifyRead, NotifyReceived};
-use crate::chat::actor_message::{Connect, Disconnect, Notification};
+use crate::chat::actor_message::*;
 use actix::prelude::*;
 use actix_web::cookie::Key;
 use sea_orm::prelude::Uuid;

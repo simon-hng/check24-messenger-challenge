@@ -4,8 +4,10 @@ use actix_identity::Identity;
 use actix_web::*;
 use entity::app::AppState;
 use sea_orm::prelude::Uuid;
-use service::actor_message::{Notification, NotifyMessage, NotifyRead};
-use service::{server, Mutation, Query};
+use service::{
+    chat::{actor_message::*, server},
+    Mutation, Query,
+};
 
 #[get("")]
 async fn get_messages(

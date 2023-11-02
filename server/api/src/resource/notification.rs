@@ -1,7 +1,7 @@
 use actix::Addr;
 use actix_web::{get, web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
-use service::{server, session};
+use service::chat::{server, session};
 use std::time::Instant;
 
 #[get("/ws")]

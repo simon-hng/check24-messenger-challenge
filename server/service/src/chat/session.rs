@@ -1,5 +1,4 @@
-use crate::actor_message::{Connect, NotifyAuth};
-use crate::chat::actor_message::Notification;
+use crate::chat::actor_message::*;
 use actix::prelude::*;
 use actix_web_actors::ws;
 use sea_orm::prelude::Uuid;
