@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { createForm } from 'svelte-forms-lib';
-	import { userStore, notificationStore } from '$lib/stores';
+	import { userStore } from '$lib/stores';
 
 	const { form, handleChange, handleSubmit } = createForm({
 		initialValues: {
 			username: ''
 		},
 
-		onSubmit: async (values) => {
-			await userStore.login(values.username);
-			notificationStore?.login();
-		}
+		onSubmit: async (values) => await userStore.login(values.username)
 	});
 </script>
 
