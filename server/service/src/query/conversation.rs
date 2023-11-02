@@ -57,6 +57,7 @@ impl Query {
             conversation,
             messages: Some(messages),
             partner: Some(partner.to_owned()),
+            unread_messages_count: None,
         };
 
         Ok(response)
@@ -89,10 +90,18 @@ impl Query {
                 .find(|partner| partner.id != account_id)
                 .unwrap();
 
+            let count_unread = Query::find_count_unread_messages_by_conversation_for_account(
+                db,
+                conversation.to_owned(),
+                account_id,
+            )
+            .await?;
+
             response.push(::entity::dto::conversation_dto::ConversationDTO {
                 conversation: conversation.to_owned(),
                 messages: Some(messages),
                 partner: Some(partner.to_owned()),
+                unread_messages_count: Some(count_unread),
             })
         }
 

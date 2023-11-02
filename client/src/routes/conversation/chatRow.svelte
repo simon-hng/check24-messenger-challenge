@@ -6,7 +6,7 @@
 	import { formatDate } from '$lib/util/date';
 
 	export let conversationDTO: ConversationDTO;
-	let { conversation, partner, messages } = conversationDTO;
+	let { conversation, partner, messages, unread_messages_count } = conversationDTO;
 
 	let last_message: Message = messages[messages.length - 1];
 </script>
@@ -22,7 +22,10 @@
 			{#if last_message}
 				<div class="flex gap-2 items-center">
 					{#if last_message.sender_id === $userStore.id}
-						<CheckIcon class="w-6 h-6" />
+						<div class="flex items-center">
+							<CheckIcon class="h-4 w-4" />
+							<CheckIcon class="h-4 w-4 -ml-2" />
+						</div>
 					{/if}
 					<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
 						{last_message.text ?? ''}
@@ -32,8 +35,8 @@
 		</div>
 		<div class="flex flex-col items-end gap-1 ml-auto">
 			<p class="text-sm whitespace-nowrap">{formatDate(last_message.created_at)}</p>
-			{#if messages}
-				<span class="badge bg-primary-500">2</span>
+			{#if unread_messages_count}
+				<span class="badge bg-primary-500">{unread_messages_count}</span>
 			{/if}
 		</div>
 	</a>

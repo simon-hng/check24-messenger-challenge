@@ -11,4 +11,5 @@ export interface ConversationDTO {
 	conversation: Conversation;
 	messages: Message[];
 	partner: Account;
+	unread_messages_count?: number;
 }
