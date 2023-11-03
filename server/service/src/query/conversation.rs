@@ -64,9 +64,9 @@ impl Query {
 
     pub async fn get_conversation_dtos(
         db: &DbConn,
-        account_id: Uuid,
+        user_id: Uuid,
     ) -> Result<Vec<::entity::dto::conversation_dto::ConversationDTO>, DbErr> {
-        let conversations = Query::find_conversation_by_account_id(db, account_id).await?;
+        let conversations = Query::find_conversation_by_account_id(db, user_id).await?;
 
         let mut response: Vec<::entity::dto::conversation_dto::ConversationDTO> = Vec::new();
 
@@ -86,13 +86,13 @@ impl Query {
 
             let partner = participants
                 .iter()
-                .find(|partner| partner.id != account_id)
+                .find(|partner| partner.id != user_id)
                 .unwrap();
 
             let count_unread = Query::find_count_unread_messages_by_conversation_for_account(
                 db,
                 conversation.to_owned(),
-                account_id,
+                user_id,
             )
             .await?;
 

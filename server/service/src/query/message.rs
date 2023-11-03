@@ -1,17 +1,16 @@
 use crate::Query;
 use ::entity::prelude::Message;
-use sea_orm::prelude::Uuid;
-use sea_orm::*;
+use sea_orm::{prelude::*, Condition, QueryOrder};
 
 impl Query {
     pub async fn find_count_unread_messages_by_conversation_for_account(
         db: &DbConn,
         conversation: ::entity::conversation::Model,
-        account_id: Uuid,
+        user_id: Uuid,
     ) -> Result<u64, DbErr> {
         let condition = Condition::all()
-            .add(::entity::message::Column::ReadAt.is_not_null())
-            .add(::entity::message::Column::RecipientId.eq(account_id));
+            .add(::entity::message::Column::ReadAt.is_null())
+            .add(::entity::message::Column::RecipientId.eq(user_id));
 
         conversation
             .find_related(Message)

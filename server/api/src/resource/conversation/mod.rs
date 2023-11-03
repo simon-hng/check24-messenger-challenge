@@ -12,7 +12,7 @@ use service::{Mutation, Query};
 async fn create_conversation(
     user: Identity,
     data: web::Data<AppState>,
-    conversation: web::Json<NewConversation>,
+    new_conversation: web::Json<NewConversation>,
 ) -> Result<impl Responder> {
     let user_id: Uuid = user
         .id()
@@ -20,7 +20,8 @@ async fn create_conversation(
         .parse()
         .map_err(|err| error::ErrorUnauthorized(err))?;
 
-    let db_conversation = Mutation::create_conversation(&data.conn, conversation, user_id)
+    let new_conversation = new_conversation.into_inner();
+    let db_conversation = Mutation::create_conversation(&data.conn, new_conversation, user_id)
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 

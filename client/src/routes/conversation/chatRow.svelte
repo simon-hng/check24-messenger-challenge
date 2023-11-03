@@ -8,7 +8,7 @@
 	export let conversationDTO: ConversationDTO;
 	let { conversation, partner, messages, unread_messages_count } = conversationDTO;
 
-	let last_message: Message = messages[messages.length - 1];
+	let last_message: Message | undefined = messages[messages.length - 1];
 </script>
 
 <li>
@@ -21,7 +21,7 @@
 			<h3 class="font-semibold text-xl">{partner.name}</h3>
 			{#if last_message}
 				<div class="flex gap-2 items-center">
-					{#if last_message.sender_id === $userStore.id}
+					{#if last_message.sender_id === $userStore?.id}
 						<div class="flex items-center">
 							<CheckIcon class="h-4 w-4" />
 							<CheckIcon class="h-4 w-4 -ml-2" />
@@ -33,11 +33,13 @@
 				</div>
 			{/if}
 		</div>
-		<div class="flex flex-col items-end gap-1 ml-auto">
-			<p class="text-sm whitespace-nowrap">{formatDate(last_message.created_at)}</p>
-			{#if unread_messages_count}
-				<span class="badge bg-primary-500">{unread_messages_count}</span>
-			{/if}
-		</div>
+		{#if last_message}
+			<div class="flex flex-col items-end gap-1 ml-auto">
+				<p class="text-sm whitespace-nowrap">{formatDate(last_message.created_at)}</p>
+				{#if unread_messages_count}
+					<span class="badge bg-primary-500">{unread_messages_count}</span>
+				{/if}
+			</div>
+		{/if}
 	</a>
 </li>

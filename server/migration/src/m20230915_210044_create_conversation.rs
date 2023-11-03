@@ -53,6 +53,7 @@ pub enum Message {
     Text,
     MessageType,
     ReadAt,
+    ReceivedAt,
     CreatedAt,
     RecipientId,
     SenderId,
@@ -170,6 +171,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(Message::Text).string().not_null())
                     .col(ColumnDef::new(Message::ReadAt).date_time())
+                    .col(ColumnDef::new(Message::ReceivedAt).date_time())
                     .col(
                         ColumnDef::new(Message::CreatedAt)
                             .date_time()
