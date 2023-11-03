@@ -16,7 +16,7 @@
 			.post(`conversation/${conversation.id}/message`, {
 				message_type: 'Standard',
 				text: currentMessageText,
-				sender_id: $userStore.id,
+				sender_id: $userStore?.id,
 				recipient_id: partner.id,
 				conversation_id: conversation.id
 			})
@@ -51,10 +51,6 @@
 
 	onDestroy(unsubscribe);
 
-	let scrollY: number;
-	let innerHeight: number;
-	let outerHeight: number;
-
 	const loadPreviousMessages = async () => {
 		const previous = await api
 			.get(`conversation/${conversation.id}/message`, {
@@ -67,16 +63,7 @@
 
 		messages = [...previous, ...messages];
 	};
-
-	let loadingPrevious: Promise<any>;
-	/*
-	$: if (scrollY === 0 && messages.length) {
-		loadingPrevious = loadPreviousMessages();
-	}
-  */
 </script>
-
-<svelte:window bind:scrollY bind:innerHeight bind:outerHeight />
 
 <div class="h-screen">
 	<div class="top-0 fixed w-full z-10">
@@ -101,11 +88,7 @@
 
 	<div class="mx-8 py-32 flex flex-col gap-4">
 		{#if messages?.length}
-			{#await loadingPrevious}
-				loading
-			{:then}
-				<button on:click={loadPreviousMessages}>Load more</button>
-			{/await}
+			<button on:click={loadPreviousMessages} class="btn variant-filled">Load more</button>
 			{#each messages as message}
 				<MessageBubble {message} {partner} />
 			{/each}
