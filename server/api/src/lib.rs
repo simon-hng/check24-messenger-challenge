@@ -43,6 +43,7 @@ pub async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .app_data(web::JsonConfig::default().limit(20_971_520)) // 20MB
             .app_data(web::Data::new(app_state.clone()))
             .app_data(web::Data::new(message_server.clone()))
             .wrap(middleware::Logger::default())

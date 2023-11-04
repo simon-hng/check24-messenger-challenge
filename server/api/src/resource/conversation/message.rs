@@ -40,7 +40,7 @@ async fn post_message(
     data: web::Data<AppState>,
     server: web::Data<Addr<server::NotificationServer>>,
     user: Identity,
-    notification: web::Json<NotifyMessage>,
+    notification: web::Json<NewMessage>,
     path: web::Path<Uuid>,
 ) -> Result<impl Responder> {
     let user_id = get_user_id(user)?;
@@ -54,10 +54,12 @@ async fn post_message(
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    let notification: NotifyMessage = db_msg.to_owned().into();
+    let mut out_notification: NewMessage = db_msg.to_owned().into();
+    // Reattach B64 encoded attachment to notification
+    out_notification.attachment = notification.attachment;
 
     server
-        .send(Notification::Message(notification))
+        .send(Notification::Message(out_notification))
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 

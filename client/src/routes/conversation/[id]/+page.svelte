@@ -20,14 +20,23 @@
 	};
 
 	const sendHandler = async () => {
-		if (!currentMessage?.text?.length) return;
+		if (!currentMessage?.text?.length && !currentMessage?.attachements?.length) return;
+
+		let attachement: string | undefined;
+		if (currentMessage.attachements) {
+			attachement = await convertFileListToBase64Array(currentMessage.attachements).then((res) =>
+				res.at(0)
+			);
+		}
+
 		let message = await api
 			.post(`conversation/${conversation.id}/message`, {
 				message_type: 'Standard',
 				text: currentMessage.text,
 				sender_id: $userStore?.id,
 				recipient_id: partner.id,
-				conversation_id: conversation.id
+				conversation_id: conversation.id,
+				attachement
 			})
 			.then((res) => res.data);
 
@@ -82,7 +91,6 @@
 			component: 'fileUpload',
 			response: async (files: FileList) => {
 				currentMessage.attachements = files;
-				const base64files = await convertFileListToBase64Array(files);
 			}
 		};
 		modalStore.trigger(modal);

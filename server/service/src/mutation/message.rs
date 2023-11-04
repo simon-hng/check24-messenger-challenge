@@ -1,4 +1,4 @@
-use crate::chat::actor_message::NotifyMessage;
+use crate::chat::actor_message::NewMessage;
 use crate::Mutation;
 use chrono::Utc;
 use entity::prelude::*;
@@ -8,7 +8,7 @@ use sea_orm::Set;
 impl Mutation {
     pub async fn create_message(
         db: &DbConn,
-        message: NotifyMessage,
+        message: NewMessage,
     ) -> Result<entity::message::Model, DbErr> {
         entity::message::ActiveModel {
             message_type: Set(message.message_type.to_owned()),
