@@ -5,6 +5,7 @@
 	import { api } from '$lib/api';
 	import { userStore, notificationStore } from '$lib/stores';
 	import { onDestroy } from 'svelte';
+	import { convertFileListToBase64Array } from '$lib/util/base64';
 
 	export let data;
 
@@ -79,8 +80,9 @@
 		const modal: ModalSettings = {
 			type: 'component',
 			component: 'fileUpload',
-			response: (files: FileList) => {
+			response: async (files: FileList) => {
 				currentMessage.attachements = files;
+				const base64files = await convertFileListToBase64Array(files);
 			}
 		};
 		modalStore.trigger(modal);
