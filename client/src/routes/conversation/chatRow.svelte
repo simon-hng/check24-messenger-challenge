@@ -2,13 +2,23 @@
 	import type { ConversationDTO, Message } from '$lib/types';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import CheckIcon from '$lib/icons/checkIcon.svelte';
-	import { userStore } from '$lib/stores';
+	import { notificationStore, userStore } from '$lib/stores';
 	import { formatDate } from '$lib/util/date';
+	import { onDestroy } from 'svelte';
 
 	export let conversationDTO: ConversationDTO;
 	let { conversation, partner, messages, unread_messages_count } = conversationDTO;
 
 	let last_message: Message | undefined = messages[messages.length - 1];
+
+	const unsubscribe = notificationStore.subscribe((notification) => {
+		if (notification?.type === 'Message' && notification?.conversation_id == conversation.id) {
+			messages = [...(messages ?? []), notification];
+			return;
+		}
+	});
+
+	onDestroy(unsubscribe);
 </script>
 
 <li>

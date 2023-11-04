@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton';
+	import { Avatar, getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import { api } from '$lib/api';
@@ -8,14 +8,22 @@
 
 	export let data;
 
+	type CurrentMessage = {
+		text: string;
+		attachements?: FileList;
+	};
+
 	let { conversation, partner, messages } = data;
-	let currentMessageText = '';
+	let currentMessage: CurrentMessage = {
+		text: ''
+	};
 
 	const sendHandler = async () => {
+		if (!currentMessage?.text?.length) return;
 		let message = await api
 			.post(`conversation/${conversation.id}/message`, {
 				message_type: 'Standard',
-				text: currentMessageText,
+				text: currentMessage.text,
 				sender_id: $userStore?.id,
 				recipient_id: partner.id,
 				conversation_id: conversation.id
@@ -23,7 +31,9 @@
 			.then((res) => res.data);
 
 		messages = [...messages, message];
-		currentMessageText = '';
+		currentMessage = {
+			text: ''
+		};
 	};
 
 	const unsubscribe = notificationStore.subscribe((notification) => {
@@ -63,6 +73,18 @@
 
 		messages = [...previous, ...messages];
 	};
+
+	const modalStore = getModalStore();
+	const openFileUploadModal = () => {
+		const modal: ModalSettings = {
+			type: 'component',
+			component: 'fileUpload',
+			response: (files: FileList) => {
+				currentMessage.attachements = files;
+			}
+		};
+		modalStore.trigger(modal);
+	};
 </script>
 
 <div class="h-screen">
@@ -80,7 +102,7 @@
 				/>
 				<div>
 					<h2 class="font-semibold text-xl">{partner?.name}</h2>
-					<p class="text-sm">online</p>
+					<p class="text-sm">{partner?.account_type}</p>
 				</div>
 			</div>
 		</div>
@@ -97,9 +119,9 @@
 
 	<div class="fixed bottom-0 w-full px-8 py-6">
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
-			<button class="input-group-shim">+</button>
+			<button class="input-group-shim" on:click={openFileUploadModal}>+</button>
 			<textarea
-				bind:value={currentMessageText}
+				bind:value={currentMessage.text}
 				class="bg-transparent border-0 ring-0 p-2 resize-none"
 				name="prompt"
 				id="prompt"
