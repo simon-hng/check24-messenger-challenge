@@ -9,5 +9,6 @@ pub mod app;
 pub mod conversation;
 pub mod conversation_account;
 pub mod dto;
+pub mod file;
 pub mod message;
 pub mod sea_orm_active_enums;
