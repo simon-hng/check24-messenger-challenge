@@ -12,7 +12,7 @@
 
 	type CurrentMessage = {
 		text: string;
-		attachements?: FileList;
+		attachments?: FileList;
 	};
 
 	let { conversation, partner, messages } = data;
@@ -21,12 +21,13 @@
 	};
 
 	const sendHandler = async () => {
-		if (!currentMessage?.text?.length && !currentMessage?.attachements?.length) return;
+		if (!currentMessage?.text?.length && !currentMessage?.attachments?.length) return;
 
-		let attachements: string[] | undefined;
-		if (currentMessage.attachements) {
-			attachements = await convertFileListToBase64Array(currentMessage.attachements);
-		}
+		let attachments = currentMessage.attachments?.length
+			? await convertFileListToBase64Array(currentMessage.attachments)
+			: undefined;
+
+		console.log(attachments);
 
 		let message = await api
 			.post(`conversation/${conversation.id}/message`, {
@@ -35,7 +36,7 @@
 				sender_id: $userStore?.id,
 				recipient_id: partner.id,
 				conversation_id: conversation.id,
-				attachements
+				attachments: attachments
 			})
 			.then((res) => res.data);
 
@@ -89,7 +90,7 @@
 			type: 'component',
 			component: 'fileUpload',
 			response: async (files: FileList) => {
-				currentMessage.attachements = files;
+				currentMessage.attachments = files;
 			}
 		};
 		modalStore.trigger(modal);
@@ -127,9 +128,9 @@
 	</div>
 
 	<div class="fixed bottom-0 w-full px-8 py-6">
-		{#if currentMessage.attachements}
+		{#if currentMessage.attachments}
 			<div class="bg-surface-200-700-token mb-4 rounded p-4">
-				<FileListComponent files={currentMessage.attachements} />
+				<FileListComponent files={currentMessage.attachments} />
 			</div>
 		{/if}
 
