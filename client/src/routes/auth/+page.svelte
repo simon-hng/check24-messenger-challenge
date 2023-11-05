@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createForm } from 'svelte-forms-lib';
 	import { userStore } from '$lib/stores';
+	import { Avatar } from '@skeletonlabs/skeleton';
 
 	const { form, handleChange, handleSubmit } = createForm({
 		initialValues: {
@@ -13,12 +14,20 @@
 
 {#if $userStore}
 	<div class="m-8 flex gap-8 flex-col">
-		<button
-			class="btn variant-outline"
-			on:click={() => {
-				userStore.logout();
-			}}>Logout</button
-		>
+		<div class="flex gap-4 items-center">
+			<Avatar
+				src={$userStore?.picture}
+				width="w-12 h-12"
+				rounded="rounded-full"
+				class="flex-shrink-0"
+			/>
+			<div>
+				<p class="font-bold">{$userStore.name}</p>
+				<p class="text-sm">{$userStore.account_type}</p>
+			</div>
+		</div>
+		<a class="btn" href="/conversation">Show conversations</a>
+		<button class="btn variant-outline" on:click={() => void userStore.logout()}>Logout</button>
 	</div>
 {:else}
 	<form class="space-y-2 m-8" on:submit={handleSubmit}>
