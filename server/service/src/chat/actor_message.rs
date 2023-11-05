@@ -4,7 +4,7 @@ use sea_orm::prelude::{DateTime, Uuid};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct NewMessage {
+pub struct NotifyMessage {
     pub id: Option<Uuid>,
     pub message_type: MessageType,
     pub text: String,
@@ -12,12 +12,12 @@ pub struct NewMessage {
     pub recipient_id: Uuid,
     pub sender_id: Uuid,
     pub conversation_id: Uuid,
-    pub attachment: Option<String>,
+    pub attachments: Option<Vec<String>>,
 }
 
-impl From<entity::message::Model> for NewMessage {
+impl From<entity::message::Model> for NotifyMessage {
     fn from(value: entity::message::Model) -> Self {
-        NewMessage {
+        NotifyMessage {
             id: Some(value.id),
             message_type: value.message_type,
             text: value.text,
@@ -25,7 +25,7 @@ impl From<entity::message::Model> for NewMessage {
             recipient_id: value.recipient_id,
             sender_id: value.sender_id,
             conversation_id: value.conversation_id,
-            attachment: None,
+            attachments: None,
         }
     }
 }
@@ -57,7 +57,7 @@ pub struct NotifyAuth {
 #[rtype(result = "()")]
 #[serde(tag = "type")]
 pub enum Notification {
-    Message(NewMessage),
+    Message(NotifyMessage),
     Read(NotifyRead),
     Auth(NotifyAuth),
 }
