@@ -6,6 +6,7 @@
 	import { userStore, notificationStore } from '$lib/stores';
 	import { onDestroy } from 'svelte';
 	import { convertFileListToBase64Array } from '$lib/util/base64';
+	import FileListComponent from '$lib/components/fileList.svelte';
 
 	export let data;
 
@@ -22,11 +23,9 @@
 	const sendHandler = async () => {
 		if (!currentMessage?.text?.length && !currentMessage?.attachements?.length) return;
 
-		let attachement: string | undefined;
+		let attachements: string[] | undefined;
 		if (currentMessage.attachements) {
-			attachement = await convertFileListToBase64Array(currentMessage.attachements).then((res) =>
-				res.at(0)
-			);
+			attachements = await convertFileListToBase64Array(currentMessage.attachements);
 		}
 
 		let message = await api
@@ -36,7 +35,7 @@
 				sender_id: $userStore?.id,
 				recipient_id: partner.id,
 				conversation_id: conversation.id,
-				attachement
+				attachements
 			})
 			.then((res) => res.data);
 
@@ -128,6 +127,12 @@
 	</div>
 
 	<div class="fixed bottom-0 w-full px-8 py-6">
+		{#if currentMessage.attachements}
+			<div class="bg-surface-200-700-token mb-4 rounded p-4">
+				<FileListComponent files={currentMessage.attachements} />
+			</div>
+		{/if}
+
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
 			<button class="input-group-shim" on:click={openFileUploadModal}>+</button>
 			<textarea
