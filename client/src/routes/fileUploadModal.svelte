@@ -21,7 +21,7 @@
 
 {#if $modalStore[0]}
 	<div class="modal-example-form card p-4 w-modal shadow-xl space-y-4">
-		<FileDropzone name="files" bind:files>
+		<FileDropzone name="files" bind:files multiple>
 			<svelte:fragment slot="lead">
 				<Fa icon={faUpload} size="3x" class="mx-auto" />
 			</svelte:fragment>

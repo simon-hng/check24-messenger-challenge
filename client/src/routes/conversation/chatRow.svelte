@@ -32,10 +32,7 @@
 			{#if last_message}
 				<div class="flex gap-2 items-center">
 					{#if last_message.sender_id === $userStore?.id}
-						<div class="flex items-center">
-							<CheckIcon class="h-4 w-4" />
-							<CheckIcon class="h-4 w-4 -ml-2" />
-						</div>
+						<CheckIcon class="h-4 w-4" />
 					{/if}
 					<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
 						{last_message.text ?? ''}

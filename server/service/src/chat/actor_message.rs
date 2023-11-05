@@ -30,13 +30,6 @@ impl From<entity::message::Model> for NewMessage {
     }
 }
 
-// TODO: This is probably not even necessary
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct NotifyReceived {
-    pub message_id: Uuid,
-    pub recipient_id: Uuid,
-}
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct NotifyRead {
     pub read_at: DateTime,
@@ -65,7 +58,6 @@ pub struct NotifyAuth {
 #[serde(tag = "type")]
 pub enum Notification {
     Message(NewMessage),
-    Received(NotifyReceived),
     Read(NotifyRead),
     Auth(NotifyAuth),
 }

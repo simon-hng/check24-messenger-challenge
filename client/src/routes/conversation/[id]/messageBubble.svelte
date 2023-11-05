@@ -11,7 +11,7 @@
 	export let partner: Account;
 </script>
 
-{#if message.sender_id !== $userStore.id}
+{#if message.sender_id !== $userStore?.id}
 	<div
 		class="grid grid-cols-[auto_1fr] gap-2"
 		use:viewport
@@ -40,10 +40,7 @@
 				<small class="opacity-50 flex gap-1 items-center">
 					{formatDate(message.created_at)}
 					{#if message.read_at}
-						<div class="flex items-center">
-							<CheckIcon class="h-4 w-4" />
-							<CheckIcon class="h-4 w-4 -ml-2" />
-						</div>
+						<CheckIcon class="h-4 w-4" />
 					{/if}
 				</small>
 			</header>

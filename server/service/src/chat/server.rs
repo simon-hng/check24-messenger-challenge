@@ -54,7 +54,6 @@ impl Handler<Notification> for NotificationServer {
         // TODO: this looks like it could be drier. Perhaps separate the enums?
         let recipient_id = match msg {
             Notification::Message(NewMessage { recipient_id, .. }) => recipient_id,
-            Notification::Received(NotifyReceived { recipient_id, .. }) => recipient_id,
             Notification::Read(NotifyRead {
                 sender_id: recipient_id,
                 ..

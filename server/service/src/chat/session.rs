@@ -69,9 +69,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsNotifierSession
 
                 self.addr.do_send(message);
             }
-            ws::Message::Binary(bin) => {
-                todo!();
-            }
             _ => todo!(),
         }
     }
