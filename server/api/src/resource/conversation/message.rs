@@ -46,7 +46,6 @@ async fn post_message(
     let user_id = get_user_id(user)?;
     let conversation_id = path.into_inner();
 
-    log::debug!("{:?}", notification.attachments);
     let mut notification = notification.into_inner();
     notification.sender_id = user_id;
     notification.conversation_id = conversation_id;

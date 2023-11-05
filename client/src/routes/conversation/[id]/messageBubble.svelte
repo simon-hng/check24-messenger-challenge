@@ -45,6 +45,11 @@
 				</small>
 			</header>
 			<p>{message.text}</p>
+			{#if message.attachments?.length}
+				{#each message.attachments as attachment}
+					{attachment}
+				{/each}
+			{/if}
 		</div>
 
 		<Avatar src={$userStore?.picture} width="w-12" />

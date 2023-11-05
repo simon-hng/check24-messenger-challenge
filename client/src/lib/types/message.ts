@@ -7,4 +7,5 @@ export interface Message {
 	sender_id: string; // UUID
 	recipient_id: string; // UUID
 	conversation_id: string; //UUID
+  attachments?: string[] // Base64 encoded files
 }

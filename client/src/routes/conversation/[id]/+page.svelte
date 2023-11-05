@@ -7,13 +7,11 @@
 	import { onDestroy } from 'svelte';
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import FileListComponent from '$lib/components/fileList.svelte';
+	import type { Message } from '$lib/types';
 
 	export let data;
 
-	type CurrentMessage = {
-		text: string;
-		attachments?: FileList;
-	};
+	type CurrentMessage = Pick<Message, 'text'> & { attachments?: FileList };
 
 	let { conversation, partner, messages } = data;
 	let currentMessage: CurrentMessage = {
