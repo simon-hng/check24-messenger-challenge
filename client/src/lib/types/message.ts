@@ -9,3 +9,5 @@ export interface Message {
 	conversation_id: string; //UUID
 	attachments?: string[]; // Base64 encoded files
 }
+
+export type CurrentMessage = Pick<Message, 'text' | 'message_type'> & { attachments?: FileList };
