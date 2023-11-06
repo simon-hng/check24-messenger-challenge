@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 serde = { workspace = true }
 sea-orm = { workspace = true }
+base64 = "0.21.5"
 entity = { path = "../entity" }
 actix = "0.13"
 actix-web = "4"

@@ -54,7 +54,16 @@ async fn post_message(
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
+    /* TODO: persist message attachments
+    if let Some(attachments) = notification.attachments.to_owned() {
+        Mutation::create_message_attachments(&data.conn, db_msg.id, attachments)
+            .await
+            .map_err(|err| error::ErrorInternalServerError(err))?;
+    }
+    */
+
     let mut out_notification: NotifyMessage = db_msg.to_owned().into();
+
     // Reattach B64 encoded attachment to notification
     out_notification.attachments = notification.attachments;
 
