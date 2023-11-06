@@ -4,10 +4,25 @@
 	import MessageBubble from './messageBubble.svelte';
 	import ActionBar from './actionBar.svelte';
 	import { conversationStore } from '$lib/stores';
+	import { api } from '$lib/api';
 
 	export let data;
 
 	$: dto = $conversationStore ? $conversationStore[data.id] : undefined;
+	$: messages = dto?.messages ?? [];
+
+	const loadPreviousMessages = async () => {
+		const previous = await api
+			.get(`conversation/${data.id}/message`, {
+				params: {
+					limit: 10,
+					before: messages[0].created_at
+				}
+			})
+			.then((res) => res.data);
+
+		$conversationStore[data.id].messages = [...previous, ...messages];
+	};
 </script>
 
 <div class="h-screen">
@@ -32,9 +47,9 @@
 	</div>
 
 	<div class="mx-8 py-32 flex flex-col gap-4">
-		{#if dto?.messages?.length}
-			<!--<button on:click={dto.loadPreviousMessages} class="btn variant-filled">Load more</button>-->
-			{#each dto.messages as message}
+		{#if messages.length && dto}
+			<button on:click={loadPreviousMessages} class="btn variant-filled">Load more</button>
+			{#each messages as message}
 				<MessageBubble {message} partner={dto.partner} />
 			{/each}
 		{/if}
