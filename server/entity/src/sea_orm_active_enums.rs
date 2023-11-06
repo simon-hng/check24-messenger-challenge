@@ -28,6 +28,8 @@ pub enum MessageType {
     AcceptQuote,
     #[sea_orm(string_value = "quote_offer")]
     QuoteOffer,
+    #[sea_orm(string_value = "reject_quote")]
+    RejectQuote,
     #[sea_orm(string_value = "standard")]
     Standard,
 }

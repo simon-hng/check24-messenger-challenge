@@ -38,12 +38,14 @@ pub enum ConversationAccount {
 #[derive(Iden, EnumIter)]
 pub enum MessageType {
     Table,
-    #[iden = "quote_offer"]
-    Quote,
     #[iden = "standard"]
     Standard,
+    #[iden = "quote_offer"]
+    Quote,
     #[iden = "accept_quote"]
     Accept,
+    #[iden = "reject_quote"]
+    Reject,
 }
 
 #[derive(DeriveIden)]
