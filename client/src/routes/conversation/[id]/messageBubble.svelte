@@ -47,6 +47,11 @@
 			<p>{message.text}</p>
 
 			<div bind:this={imageContainer} />
+
+			{#if message.message_type === 'QuoteOffer'}
+				<button class="btn variant-filled-success">Accept</button>
+				<button class="btn variant-filled-error">Refuse</button>
+			{/if}
 		</div>
 	</div>
 {:else}
@@ -64,6 +69,10 @@
 			<p>{message.text}</p>
 
 			<div bind:this={imageContainer} />
+
+			{#if message.message_type === 'QuoteOffer'}
+				<p class="italic">Waiting for partner response</p>
+			{/if}
 		</div>
 
 		<Avatar src={$userStore?.picture} width="w-12" />

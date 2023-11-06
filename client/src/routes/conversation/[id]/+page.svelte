@@ -8,14 +8,17 @@
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import FileListComponent from '$lib/components/fileList.svelte';
 	import type { Message } from '$lib/types';
+	import { faHandshake } from '@fortawesome/free-solid-svg-icons';
+	import Fa from 'svelte-fa';
 
 	export let data;
 
-	type CurrentMessage = Pick<Message, 'text'> & { attachments?: FileList };
+	type CurrentMessage = Pick<Message, 'text' | 'message_type'> & { attachments?: FileList };
 
 	let { conversation, partner, messages } = data;
 	let currentMessage: CurrentMessage = {
-		text: ''
+		text: '',
+		message_type: 'Standard'
 	};
 
 	const sendHandler = async () => {
@@ -27,7 +30,7 @@
 
 		let message = await api
 			.post(`conversation/${conversation.id}/message`, {
-				message_type: 'Standard',
+				message_type: currentMessage.message_type,
 				text: currentMessage.text,
 				sender_id: $userStore?.id,
 				recipient_id: partner.id,
@@ -40,7 +43,8 @@
 
 		messages = [...messages, message];
 		currentMessage = {
-			text: ''
+			text: '',
+			message_type: 'Standard'
 		};
 	};
 
@@ -132,11 +136,24 @@
 			</div>
 		{/if}
 
-		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto] rounded-container-token">
+		<div class="input-group input-group-divider rounded-container-token flex flex-row">
 			<button class="input-group-shim" on:click={openFileUploadModal}>+</button>
+			{#if $userStore?.account_type === 'ServiceProvider'}
+				<button
+					class={currentMessage.message_type === 'Standard'
+						? 'duration-200'
+						: 'variant-soft-success rounded duration-200'}
+					on:click={() => {
+						currentMessage.message_type =
+							currentMessage.message_type === 'Standard' ? 'QuoteOffer' : 'Standard';
+					}}
+				>
+					<Fa icon={faHandshake} />
+				</button>
+			{/if}
 			<textarea
 				bind:value={currentMessage.text}
-				class="bg-transparent border-0 ring-0 p-2 resize-none"
+				class="bg-transparent border-0 ring-0 p-2 resize-none flex-grow"
 				name="prompt"
 				id="prompt"
 				placeholder="Write a message..."

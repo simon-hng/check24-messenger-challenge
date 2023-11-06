@@ -1,6 +1,6 @@
 export interface Message {
 	id: string; // UUID
-	message_type: 'Standard' | 'Accept_quote' | 'Quote_offer';
+	message_type: 'Standard' | 'AcceptQuote' | 'QuoteOffer';
 	text: string;
 	created_at: Date;
 	read_at: Date;
