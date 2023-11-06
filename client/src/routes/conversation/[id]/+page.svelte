@@ -8,7 +8,7 @@
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import FileListComponent from '$lib/components/fileList.svelte';
 	import type { Message } from '$lib/types';
-	import { faCheck, faHandshake, faSadCry, faXmark } from '@fortawesome/free-solid-svg-icons';
+	import { faCheck, faHandshake, faXmark } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
 	export let data;
@@ -52,6 +52,9 @@
 		switch (notification?.type) {
 			case 'Message': {
 				messages = [...(messages ?? []), notification];
+				if (notification.message_type === 'RejectQuote') {
+					conversation.state = 'Rejected';
+				}
 				return;
 			}
 			case 'Read': {
@@ -130,7 +133,7 @@
 	</div>
 
 	<div class="fixed bottom-0 w-full px-8 py-6">
-		{#if !(conversation.state === 'Rejected' && $userStore?.account_type === 'ServiceProvider')}
+		{#if !(conversation?.state === 'Rejected' && $userStore?.account_type === 'ServiceProvider')}
 			{#if currentMessage.attachments}
 				<div class="bg-surface-200-700-token mb-4 rounded p-4">
 					<FileListComponent files={currentMessage.attachments} />
@@ -152,10 +155,26 @@
 						<Fa icon={faHandshake} />
 					</button>
 				{:else}
-					<button on:click={() => console.log('TODO')}>
+					<button
+						class={currentMessage.message_type !== 'AcceptQuote'
+							? 'duration-200'
+							: 'variant-soft-success rounded duration-200'}
+						on:click={() => {
+							currentMessage.message_type =
+								currentMessage.message_type === 'Standard' ? 'AcceptQuote' : 'Standard';
+						}}
+					>
 						<Fa icon={faCheck} />
 					</button>
-					<button on:click={() => console.log('TODO')}>
+					<button
+						class={currentMessage.message_type !== 'RejectQuote'
+							? 'duration-200'
+							: 'variant-soft-error rounded duration-200'}
+						on:click={() => {
+							currentMessage.message_type =
+								currentMessage.message_type === 'Standard' ? 'RejectQuote' : 'Standard';
+						}}
+					>
 						<Fa icon={faXmark} />
 					</button>
 				{/if}

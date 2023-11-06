@@ -9,8 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
     pub name: Option<String>,
-    #[sea_orm(column_type = "Binary(BlobSize::Blob(None))")]
-    pub object: Vec<u8>,
+    pub object: String,
     pub message_id: Option<Uuid>,
 }
 

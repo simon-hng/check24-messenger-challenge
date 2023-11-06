@@ -29,7 +29,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(File::Name).string())
-                    .col(ColumnDef::new(File::Object).binary().not_null())
+                    .col(ColumnDef::new(File::Object).string().not_null())
                     .col(ColumnDef::new(File::MessageId).uuid())
                     .foreign_key(
                         ForeignKey::create()

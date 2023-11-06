@@ -1,4 +1,5 @@
 use crate::Mutation;
+use entity::sea_orm_active_enums::ConversationState;
 use sea_orm::prelude::*;
 use sea_orm::Set;
 
@@ -30,5 +31,19 @@ impl Mutation {
         .await?;
 
         Ok(db_conversation)
+    }
+
+    pub async fn update_conversation_state(
+        db: &DatabaseConnection,
+        conversation_id: Uuid,
+        state: ConversationState,
+    ) -> Result<entity::conversation::Model, DbErr> {
+        entity::conversation::ActiveModel {
+            id: Set(conversation_id),
+            state: Set(Some(state)),
+            ..Default::default()
+        }
+        .update(db)
+        .await
     }
 }

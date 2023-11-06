@@ -2764,7 +2764,6 @@ dependencies = [
  "actix-session",
  "actix-web",
  "actix-web-actors",
- "base64 0.21.5",
  "chrono",
  "entity",
  "log",

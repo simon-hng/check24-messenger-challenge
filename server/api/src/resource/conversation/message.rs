@@ -3,6 +3,7 @@ use actix::Addr;
 use actix_identity::Identity;
 use actix_web::*;
 use entity::app::AppState;
+use entity::sea_orm_active_enums::{ConversationState, MessageType};
 use sea_orm::prelude::Uuid;
 use service::{
     chat::{actor_message::*, server},
@@ -50,17 +51,27 @@ async fn post_message(
     notification.sender_id = user_id;
     notification.conversation_id = conversation_id;
 
+    let conversation_state = match notification.message_type {
+        MessageType::AcceptQuote => Some(ConversationState::Accepted),
+        MessageType::RejectQuote => Some(ConversationState::Rejected),
+        _ => None,
+    };
+
+    if let Some(conversation_state) = conversation_state {
+        Mutation::update_conversation_state(&data.conn, conversation_id, conversation_state)
+            .await
+            .map_err(|err| error::ErrorInternalServerError(err))?;
+    }
+
     let db_msg = Mutation::create_message(&data.conn, notification.to_owned())
         .await
         .map_err(|err| error::ErrorInternalServerError(err))?;
 
-    /* TODO: persist message attachments
     if let Some(attachments) = notification.attachments.to_owned() {
         Mutation::create_message_attachments(&data.conn, db_msg.id, attachments)
             .await
             .map_err(|err| error::ErrorInternalServerError(err))?;
     }
-    */
 
     let mut out_notification: NotifyMessage = db_msg.to_owned().into();
 
