@@ -1,18 +1,11 @@
 import { get, writable } from 'svelte/store';
 import { userStore } from './userStore';
 import { browser } from '$app/environment';
-import type { Message } from '$lib/types';
-
-type Notification =
-	| ({
-			type: 'Message';
-	  } & Message)
-	| { type: 'Confirm_auth'; id: string }
-	| { type: 'Read'; message_id: string; read_at: Date; sender_id: string };
+import type { WSNotification } from '$lib/types';
 
 const createNotificationStore = () => {
 	const user = get(userStore);
-	const { subscribe, set } = writable<Notification>();
+	const { subscribe, set } = writable<WSNotification>();
 
 	let socket: WebSocket;
 

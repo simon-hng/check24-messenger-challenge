@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userStore } from '$lib/stores';
+	import { conversationStore, userStore } from '$lib/stores';
 	import FileListComponent from '$lib/components/fileList.svelte';
 	import { faCheck, faHandshake, faXmark } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
@@ -8,34 +8,35 @@
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 
-	export let data;
-	let { conversation, partner, messages } = data;
+	export let conversation_id: string;
+
+	$: dto = $conversationStore ? $conversationStore[conversation_id] : undefined;
 	let currentMessage: CurrentMessage = {
 		text: '',
 		message_type: 'Standard'
 	};
 
 	const sendHandler = async () => {
-		if (!currentMessage?.text?.length && !currentMessage?.attachments?.length) return;
+		if ((!currentMessage?.text?.length && !currentMessage?.attachments?.length) || !dto) return;
 
 		let attachments = currentMessage.attachments?.length
 			? await convertFileListToBase64Array(currentMessage.attachments)
 			: undefined;
 
 		let message = await api
-			.post(`conversation/${conversation.id}/message`, {
+			.post(`conversation/${dto.conversation.id}/message`, {
 				message_type: currentMessage.message_type,
 				text: currentMessage.text,
 				sender_id: $userStore?.id,
-				recipient_id: partner.id,
-				conversation_id: conversation.id,
+				recipient_id: dto.partner.id,
+				conversation_id: dto.conversation.id,
 				attachments: attachments
 			})
 			.then((res) => res.data);
 
 		message.attachments = attachments;
 
-		messages = [...messages, message];
+		$conversationStore[conversation_id].messages = [...dto.messages, message];
 		currentMessage = {
 			text: '',
 			message_type: 'Standard'
@@ -56,12 +57,12 @@
 </script>
 
 <div class="fixed bottom-0 w-full px-8 py-6">
-	{#if $userStore?.account_type === 'ServiceProvider' && conversation.state === 'Rejected'}
+	{#if $userStore?.account_type === 'ServiceProvider' && dto?.conversation?.state === 'Rejected'}
 		<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
 			<Fa icon={faXmark} size="2x" class="text-error-500" />
 			<p>Your offer got rejected</p>
 		</div>
-	{:else if $userStore?.account_type === 'ServiceProvider' && conversation.state === 'Accepted'}
+	{:else if $userStore?.account_type === 'ServiceProvider' && dto?.conversation?.state === 'Accepted'}
 		<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
 			<Fa icon={faCheck} size="2x" class="text-success-500" />
 			<p class="flex-grow">Your offer got accepted</p>

@@ -35,6 +35,7 @@ pub struct NotifyRead {
     pub read_at: DateTime,
     pub message_id: Uuid,
     pub sender_id: Uuid,
+    pub conversation_id: Uuid,
 }
 
 impl From<entity::message::Model> for NotifyRead {
@@ -43,6 +44,7 @@ impl From<entity::message::Model> for NotifyRead {
             message_id: value.id,
             read_at: value.read_at.unwrap(),
             sender_id: value.sender_id,
+            conversation_id: value.conversation_id,
         }
     }
 }

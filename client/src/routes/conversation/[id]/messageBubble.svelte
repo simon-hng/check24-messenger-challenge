@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Account, Message } from '$lib/types';
-	import { userStore } from '$lib/stores';
+	import { conversationStore, userStore } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import { formatDate } from '$lib/util/date';
 	import { viewport } from '$lib/util/useViewportAction';
@@ -31,11 +31,11 @@
 		class="grid grid-cols-[auto_1fr] gap-2"
 		use:viewport
 		on:enterViewport={async () => {
-			if (!message.read_at) {
-				message = await api
-					.post(`conversation/${message.conversation_id}/message/${message.id}/read`)
-					.then((res) => res.data);
-			}
+			if (message.read_at) return;
+
+			message = await api
+				.post(`conversation/${message.conversation_id}/message/${message.id}/read`)
+				.then((res) => res.data);
 		}}
 	>
 		<Avatar src={partner.picture} width="w-12" />
