@@ -6,9 +6,24 @@
 	import { viewport } from '$lib/util/useViewportAction';
 	import { api } from '$lib/api';
 	import CheckIcon from '$lib/icons/checkIcon.svelte';
+	import { onMount } from 'svelte';
 
 	export let message: Message;
 	export let partner: Account;
+
+	let imageContainer: Element;
+
+	const imageMimeTypes = ['image/jpeg', 'image/png'];
+	let images = message?.attachments; //TODO: Filter mime type
+
+	onMount(() => {
+		images?.forEach((attachment) => {
+			const img = new Image();
+			img.src = attachment;
+
+			imageContainer.appendChild(img);
+		});
+	});
 </script>
 
 {#if message.sender_id !== $userStore?.id}
@@ -30,6 +45,8 @@
 				<small class="opacity-50">{formatDate(message.created_at)}</small>
 			</header>
 			<p>{message.text}</p>
+
+			<div bind:this={imageContainer} />
 		</div>
 	</div>
 {:else}
@@ -45,11 +62,8 @@
 				</small>
 			</header>
 			<p>{message.text}</p>
-			{#if message.attachments?.length}
-				{#each message.attachments as attachment}
-					{attachment}
-				{/each}
-			{/if}
+
+			<div bind:this={imageContainer} />
 		</div>
 
 		<Avatar src={$userStore?.picture} width="w-12" />

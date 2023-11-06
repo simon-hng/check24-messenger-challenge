@@ -25,8 +25,6 @@
 			? await convertFileListToBase64Array(currentMessage.attachments)
 			: undefined;
 
-		console.log(attachments);
-
 		let message = await api
 			.post(`conversation/${conversation.id}/message`, {
 				message_type: 'Standard',
@@ -37,6 +35,8 @@
 				attachments: attachments
 			})
 			.then((res) => res.data);
+
+		message.attachments = attachments;
 
 		messages = [...messages, message];
 		currentMessage = {
