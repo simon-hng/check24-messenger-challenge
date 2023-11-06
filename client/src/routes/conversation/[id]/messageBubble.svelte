@@ -49,8 +49,7 @@
 			<div bind:this={imageContainer} />
 
 			{#if message.message_type === 'QuoteOffer'}
-				<button class="btn variant-filled-success">Accept</button>
-				<button class="btn variant-filled-error">Refuse</button>
+				<p class="italic">Accept or refuse this offer with a message</p>
 			{/if}
 		</div>
 	</div>

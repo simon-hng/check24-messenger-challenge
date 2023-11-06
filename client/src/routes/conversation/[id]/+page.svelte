@@ -8,7 +8,7 @@
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import FileListComponent from '$lib/components/fileList.svelte';
 	import type { Message } from '$lib/types';
-	import { faHandshake } from '@fortawesome/free-solid-svg-icons';
+	import { faCheck, faHandshake, faSadCry, faXmark } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
 	export let data;
@@ -130,36 +130,50 @@
 	</div>
 
 	<div class="fixed bottom-0 w-full px-8 py-6">
-		{#if currentMessage.attachments}
-			<div class="bg-surface-200-700-token mb-4 rounded p-4">
-				<FileListComponent files={currentMessage.attachments} />
+		{#if !(conversation.state === 'Rejected' && $userStore?.account_type === 'ServiceProvider')}
+			{#if currentMessage.attachments}
+				<div class="bg-surface-200-700-token mb-4 rounded p-4">
+					<FileListComponent files={currentMessage.attachments} />
+				</div>
+			{/if}
+
+			<div class="input-group input-group-divider rounded-container-token flex flex-row">
+				<button class="input-group-shim" on:click={openFileUploadModal}>+</button>
+				{#if $userStore?.account_type === 'ServiceProvider'}
+					<button
+						class={currentMessage.message_type === 'Standard'
+							? 'duration-200'
+							: 'variant-soft-success rounded duration-200'}
+						on:click={() => {
+							currentMessage.message_type =
+								currentMessage.message_type === 'Standard' ? 'QuoteOffer' : 'Standard';
+						}}
+					>
+						<Fa icon={faHandshake} />
+					</button>
+				{:else}
+					<button on:click={() => console.log('TODO')}>
+						<Fa icon={faCheck} />
+					</button>
+					<button on:click={() => console.log('TODO')}>
+						<Fa icon={faXmark} />
+					</button>
+				{/if}
+				<textarea
+					bind:value={currentMessage.text}
+					class="bg-transparent border-0 ring-0 p-2 resize-none flex-grow"
+					name="prompt"
+					id="prompt"
+					placeholder="Write a message..."
+					rows="1"
+				/>
+				<button class="variant-filled-primary" type="submit" on:click={sendHandler}>Send</button>
+			</div>
+		{:else}
+			<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
+				<Fa icon={faXmark} size="2x" class="text-error-500" />
+				<p>Your offer got rejected</p>
 			</div>
 		{/if}
-
-		<div class="input-group input-group-divider rounded-container-token flex flex-row">
-			<button class="input-group-shim" on:click={openFileUploadModal}>+</button>
-			{#if $userStore?.account_type === 'ServiceProvider'}
-				<button
-					class={currentMessage.message_type === 'Standard'
-						? 'duration-200'
-						: 'variant-soft-success rounded duration-200'}
-					on:click={() => {
-						currentMessage.message_type =
-							currentMessage.message_type === 'Standard' ? 'QuoteOffer' : 'Standard';
-					}}
-				>
-					<Fa icon={faHandshake} />
-				</button>
-			{/if}
-			<textarea
-				bind:value={currentMessage.text}
-				class="bg-transparent border-0 ring-0 p-2 resize-none flex-grow"
-				name="prompt"
-				id="prompt"
-				placeholder="Write a message..."
-				rows="1"
-			/>
-			<button class="variant-filled-primary" type="submit" on:click={sendHandler}>Send</button>
-		</div>
 	</div>
 </div>
