@@ -40,6 +40,13 @@ const createConversationStore = () => {
 				messages = [...messages, notification];
 				conversations[notification.conversation_id].messages = messages;
 
+				if (notification.message_type === 'RejectQuote') {
+					conversations[notification.conversation_id].conversation.state = 'Rejected';
+				}
+				if (notification.message_type === 'AcceptQuote') {
+					conversations[notification.conversation_id].conversation.state = 'Accepted';
+				}
+
 				return conversations;
 			});
 		}
