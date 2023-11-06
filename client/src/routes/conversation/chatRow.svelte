@@ -8,7 +8,9 @@
 	$: dto = $conversationStore ? $conversationStore[conversation_id] : undefined;
 	$: messages = dto?.messages ?? [];
 	$: lastMessage = messages[messages.length - 1];
-	$: unreadCount = messages.filter((msg) => !msg.read_at).length;
+	$: unreadCount = messages.filter(
+		(msg) => !msg.read_at && msg.recipient_id === $userStore?.id
+	).length;
 </script>
 
 <li>

@@ -36,6 +36,10 @@
 			message = await api
 				.post(`conversation/${message.conversation_id}/message/${message.id}/read`)
 				.then((res) => res.data);
+
+			$conversationStore[message.conversation_id].messages = $conversationStore[
+				message.conversation_id
+			].messages.map((msg) => (msg.id === message.id ? message : msg));
 		}}
 	>
 		<Avatar src={partner.picture} width="w-12" />
