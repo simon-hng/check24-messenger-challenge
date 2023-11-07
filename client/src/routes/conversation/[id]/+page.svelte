@@ -74,7 +74,7 @@
 	</div>
 </div>
 
-<div class="mx-8 py-32 flex flex-col gap-4">
+<div class="mx-8 pt-32 flex flex-col gap-4">
 	{#if messages.length && dto}
 		{#if !hasPreviousMessages}
 			<p class="text-sm text-center">Beginning of conversation</p>

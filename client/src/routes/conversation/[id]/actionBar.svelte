@@ -1,12 +1,18 @@
 <script lang="ts">
 	import { conversationStore, userStore } from '$lib/stores';
 	import FileListComponent from '$lib/components/fileList.svelte';
-	import { faCheck, faHandshake, faXmark } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faCheck,
+		faHandshake,
+		faStar as faStarFilled,
+		faXmark
+	} from '@fortawesome/free-solid-svg-icons';
+	import { faStar } from '@fortawesome/free-regular-svg-icons';
 	import Fa from 'svelte-fa';
 	import { api } from '$lib/api';
 	import type { CurrentMessage } from '$lib/types';
 	import { convertFileListToBase64Array } from '$lib/util/base64';
-	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore, Ratings, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { createEventDispatcher } from 'svelte';
 
 	export let conversation_id: string;
@@ -60,9 +66,23 @@
 		};
 		modalStore.trigger(modal);
 	};
+
+	let value = {
+		current: 0,
+		max: 5
+	};
+
+	let clientHeight: number;
+	let placeholder: Element;
+
+	$: if (clientHeight) {
+		placeholder?.setAttribute('style', `height: ${clientHeight}px`);
+	}
 </script>
 
-<div class="fixed bottom-0 w-full px-8 py-6">
+<div bind:this={placeholder} />
+
+<div class="fixed bottom-0 w-full px-8 py-6" bind:clientHeight>
 	{#if $userStore?.account_type === 'ServiceProvider' && dto?.conversation?.state === 'Rejected'}
 		<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
 			<Fa icon={faXmark} size="2x" class="text-error-500" />
@@ -74,7 +94,23 @@
 			<p class="flex-grow">Your offer got accepted</p>
 			<button class="btn variant-ghost">Request Review</button>
 		</div>
-	{:else}
+	{:else if $userStore?.account_type === 'Customer' && dto?.conversation?.state === 'Accepted'}
+		<div class="card p-4 rounded-container-token flex gap-4 flex-col">
+			<p class="text-center">Leave a review for {dto?.partner.name}</p>
+			<Ratings
+				bind:value={value.current}
+				max={value.max}
+				interactive
+				on:icon={(event) => {
+					value.current = event.detail.index;
+				}}
+			>
+				<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
+				<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
+			</Ratings>
+			<button class="btn variant-ghost">Submit Review</button>
+		</div>
+	{:else if dto?.conversation?.state === 'Quoted'}
 		{#if currentMessage.attachments}
 			<div class="bg-surface-200-700-token mb-4 rounded p-4">
 				<FileListComponent files={currentMessage.attachments} />
