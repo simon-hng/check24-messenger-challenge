@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Avatar } from '@skeletonlabs/skeleton';
-	import CheckIcon from '$lib/icons/checkIcon.svelte';
 	import { conversationStore, userStore } from '$lib/stores';
 	import { formatDate } from '$lib/util/date';
+	import Fa from 'svelte-fa';
+	import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 	export let conversation_id: string;
 	$: dto = $conversationStore ? $conversationStore[conversation_id] : undefined;
@@ -27,13 +28,16 @@
 		<div class="overflow-hiden">
 			<h3 class="font-semibold text-xl">{dto?.partner?.name}</h3>
 			{#if lastMessage}
-				<div class="flex gap-2 items-center">
-					{#if lastMessage.sender_id === $userStore?.id}
-						<CheckIcon class="h-4 w-4" />
-					{/if}
+				<div class="flex items-center">
 					<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
+						{#if lastMessage.sender_id === $userStore?.id}
+							You:
+						{/if}
 						{lastMessage.text ?? ''}
 					</p>
+					{#if lastMessage.sender_id === $userStore?.id && lastMessage.read_at}
+						<Fa icon={faCheck} size="sm" />
+					{/if}
 				</div>
 			{/if}
 		</div>
