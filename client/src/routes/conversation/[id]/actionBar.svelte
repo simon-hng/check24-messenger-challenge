@@ -46,6 +46,15 @@
 		message.attachments = attachments;
 
 		$conversationStore[conversation_id].messages = [...dto.messages, message];
+
+		if (
+			currentMessage.message_type === 'AcceptQuote' ||
+			currentMessage.message_type === 'RejectQuote'
+		) {
+			$conversationStore[conversation_id].conversation.state =
+				currentMessage.message_type === 'AcceptQuote' ? 'Accepted' : 'Rejected';
+		}
+
 		currentMessage = {
 			text: '',
 			message_type: 'Standard'
