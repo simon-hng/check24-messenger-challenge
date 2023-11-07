@@ -21,7 +21,7 @@ const createUserStore = () => {
 
 	const logout = async () => {
 		await api.post('/auth/logout');
-		store.set(undefined);
+		store.update(() => undefined);
 	};
 
 	return {
