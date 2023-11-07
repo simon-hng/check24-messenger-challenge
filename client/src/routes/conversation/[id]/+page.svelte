@@ -27,8 +27,12 @@
 
 	let marker: Element;
 
-	$: if (messages || $navigating) {
+	const scrollToNewestMessage = () => {
 		marker?.scrollIntoView({ behavior: 'smooth' });
+	};
+
+	$: if ($navigating) {
+		setTimeout(scrollToNewestMessage, 1);
 	}
 </script>
 
@@ -58,8 +62,8 @@
 		{#each messages as message}
 			<MessageBubble {message} partner={dto.partner} />
 		{/each}
-		<div bind:this={marker} />
 	{/if}
 </div>
+<div bind:this={marker} />
 
-<ActionBar conversation_id={data.id} />
+<ActionBar conversation_id={data.id} on:messageSent={scrollToNewestMessage} />

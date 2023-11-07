@@ -7,6 +7,7 @@
 	import type { CurrentMessage } from '$lib/types';
 	import { convertFileListToBase64Array } from '$lib/util/base64';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { createEventDispatcher } from 'svelte';
 
 	export let conversation_id: string;
 
@@ -15,6 +16,8 @@
 		text: '',
 		message_type: 'Standard'
 	};
+
+	const dispatch = createEventDispatcher();
 
 	const sendHandler = async () => {
 		if ((!currentMessage?.text?.length && !currentMessage?.attachments?.length) || !dto) return;
@@ -41,6 +44,9 @@
 			text: '',
 			message_type: 'Standard'
 		};
+
+		// Wait a bit for messages to update
+		setTimeout(() => dispatch('messageSent'), 1);
 	};
 
 	const modalStore = getModalStore();
