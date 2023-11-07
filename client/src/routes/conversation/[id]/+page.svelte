@@ -1,32 +1,42 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton';
+	import { Avatar, ProgressRadial } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import ActionBar from './actionBar.svelte';
 	import { conversationStore } from '$lib/stores';
 	import { api } from '$lib/api';
 	import { navigating } from '$app/stores';
+	import type { Message } from '$lib/types';
 
 	export let data;
 
 	$: dto = $conversationStore ? $conversationStore[data.id] : undefined;
 	$: messages = dto?.messages ?? [];
 
+	let hasPreviousMessages = true;
+	let loadingPrevious: Promise<Message[]>;
+	const limit = 10;
+
 	const loadPreviousMessages = async () => {
-		const previous = await api
+		loadingPrevious = api
 			.get(`conversation/${data.id}/message`, {
 				params: {
-					limit: 10,
+					limit,
 					before: messages[0].created_at
 				}
 			})
 			.then((res) => res.data);
 
+		let previous = await loadingPrevious;
+
+		if (!previous.length || previous.length < limit) {
+			hasPreviousMessages = false;
+		}
+
 		$conversationStore[data.id].messages = [...previous, ...messages];
 	};
 
 	let marker: Element;
-
 	const scrollToNewestMessage = () => {
 		marker?.scrollIntoView({ behavior: 'smooth' });
 	};
@@ -34,7 +44,15 @@
 	$: if ($navigating) {
 		setTimeout(scrollToNewestMessage, 1);
 	}
+
+	let scrollY: number;
+
+	$: if (scrollY == 0 && hasPreviousMessages) {
+		loadPreviousMessages();
+	}
 </script>
+
+<svelte:window bind:scrollY />
 
 <div class="top-0 fixed w-full z-10">
 	<div class="rounded-b-2xl w-full p-4 flex flex-row items-center gap-3 bg-surface-100-800-token">
@@ -58,7 +76,12 @@
 
 <div class="mx-8 py-32 flex flex-col gap-4">
 	{#if messages.length && dto}
-		<button on:click={loadPreviousMessages} class="btn variant-filled">Load more</button>
+		{#if !hasPreviousMessages}
+			<p class="text-sm text-center">Beginning of conversation</p>
+		{/if}
+		{#await loadingPrevious}
+			<ProgressRadial class="w-10 mx-auto" />
+		{/await}
 		{#each messages as message}
 			<MessageBubble {message} partner={dto.partner} />
 		{/each}
