@@ -80,7 +80,7 @@
 			<p class="text-sm text-center">Beginning of conversation</p>
 		{/if}
 		{#await loadingPrevious}
-			<ProgressRadial class="w-10 mx-auto" />
+			<ProgressRadial class="mx-auto" width="w-10" />
 		{/await}
 		{#each messages as message}
 			<MessageBubble {message} partner={dto.partner} />
