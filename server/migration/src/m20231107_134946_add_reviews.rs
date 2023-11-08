@@ -31,7 +31,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(Review::ReviewerId).uuid().not_null())
                     .col(ColumnDef::new(Review::RecipientId).uuid().not_null())
-                    .col(ColumnDef::new(Review::Score).tiny_integer().not_null())
+                    .col(ColumnDef::new(Review::Score).integer().not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("reviewer_id")

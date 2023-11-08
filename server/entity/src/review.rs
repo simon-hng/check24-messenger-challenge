@@ -10,6 +10,7 @@ pub struct Model {
     pub id: Uuid,
     pub reviewer_id: Uuid,
     pub recipient_id: Uuid,
+    pub score: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
