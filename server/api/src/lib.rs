@@ -22,6 +22,8 @@ pub async fn main() -> std::io::Result<()> {
     let secret_key = env::var("SECRET_KEY").expect("SECRET_KEY must be set");
     let secret_key = Key::from(secret_key.as_bytes());
 
+    let client_url = env::var("CLIENT_URL").expect("Client URL must be set");
+
     // establish connection to database and apply migrations
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = Database::connect(&database_url).await.unwrap();
@@ -38,7 +40,7 @@ pub async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to connect to redis");
 
-    log::info!("starting HTTP server at http://localhost:8080");
+    log::info!("starting HTTP server on port 8080");
 
     HttpServer::new(move || {
         App::new()
@@ -50,7 +52,7 @@ pub async fn main() -> std::io::Result<()> {
             .wrap(SessionMiddleware::new(store.clone(), secret_key.clone()))
             .wrap(
                 Cors::default()
-                    .allowed_origin("http://localhost:5173")
+                    .allowed_origin(&client_url.to_string())
                     // TODO Configure cors correctly
                     .allow_any_header()
                     .allow_any_method()
@@ -62,7 +64,7 @@ pub async fn main() -> std::io::Result<()> {
             .configure(notification::init_service)
             .configure(review::init_service)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
