@@ -30,7 +30,7 @@ impl Query {
         db: &DbConn,
         conversation_id: Uuid,
         account_id: Uuid,
-    ) -> Result<entity::dto::conversation_dto::ConversationDTO, DbErr> {
+    ) -> Result<entity::dto::conversation::ConversationDTO, DbErr> {
         let conversation = Query::find_conversation_by_id(db, conversation_id)
             .await?
             .ok_or(DbErr::Custom("not found".to_string()))?;
@@ -52,7 +52,7 @@ impl Query {
             .find(|partner| partner.id != account_id)
             .unwrap();
 
-        let response = entity::dto::conversation_dto::ConversationDTO {
+        let response = entity::dto::conversation::ConversationDTO {
             conversation,
             messages: Some(messages),
             partner: Some(partner.to_owned()),
@@ -64,10 +64,10 @@ impl Query {
     pub async fn get_conversation_dtos(
         db: &DbConn,
         user_id: Uuid,
-    ) -> Result<Vec<entity::dto::conversation_dto::ConversationDTO>, DbErr> {
+    ) -> Result<Vec<entity::dto::conversation::ConversationDTO>, DbErr> {
         let conversations = Query::find_conversation_by_account_id(db, user_id).await?;
 
-        let mut response: Vec<entity::dto::conversation_dto::ConversationDTO> = Vec::new();
+        let mut response: Vec<entity::dto::conversation::ConversationDTO> = Vec::new();
 
         for conversation in conversations.iter() {
             let messages = Query::find_messages_by_conversation(
@@ -88,7 +88,7 @@ impl Query {
                 .find(|partner| partner.id != user_id)
                 .unwrap();
 
-            response.push(entity::dto::conversation_dto::ConversationDTO {
+            response.push(entity::dto::conversation::ConversationDTO {
                 conversation: conversation.to_owned(),
                 messages: Some(messages),
                 partner: Some(partner.to_owned()),

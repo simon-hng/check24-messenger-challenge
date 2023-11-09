@@ -1,1 +1,2 @@
-pub mod conversation_dto;
+pub mod conversation;
+pub mod review;

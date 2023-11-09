@@ -33,7 +33,7 @@
 			: undefined;
 
 		let message = await api
-			.post(`conversation/${dto.conversation.id}/message`, {
+			.post(`/conversation/${dto.conversation.id}/message`, {
 				message_type: currentMessage.message_type,
 				text: currentMessage.text,
 				sender_id: $userStore?.id,
@@ -101,7 +101,6 @@
 		<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
 			<Fa icon={faCheck} size="2x" class="text-success-500" />
 			<p class="flex-grow">Your offer got accepted</p>
-			<button class="btn variant-ghost">Request Review</button>
 		</div>
 	{:else if $userStore?.account_type === 'Customer' && dto?.conversation?.state === 'Accepted'}
 		<div class="card p-4 rounded-container-token flex gap-4 flex-col">
@@ -117,7 +116,15 @@
 				<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
 				<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
 			</Ratings>
-			<button class="btn variant-ghost">Submit Review</button>
+			<button
+				class="btn variant-ghost"
+				on:click={() => {
+					api.post('/review', {
+						recipient_id: dto?.partner?.id,
+						rating: value.current
+					});
+				}}>Submit Review</button
+			>
 		</div>
 	{:else if dto?.conversation?.state === 'Quoted'}
 		{#if currentMessage.attachments}
