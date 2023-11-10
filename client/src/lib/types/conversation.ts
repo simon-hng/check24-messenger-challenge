@@ -1,3 +1,4 @@
+import type { Review } from './review';
 import type { Account } from './account';
 import type { Message } from './message';
 
@@ -11,5 +12,5 @@ export interface ConversationDTO {
 	conversation: Conversation;
 	messages: Message[];
 	partner: Account;
-	unread_messages_count?: number;
+  review: Review;
 }
