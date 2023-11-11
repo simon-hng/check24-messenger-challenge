@@ -102,30 +102,59 @@
 			<Fa icon={faCheck} size="2x" class="text-success-500" />
 			<p class="flex-grow">Your offer got accepted</p>
 		</div>
+
+		{#if dto.review}
+			<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
+				<Fa icon={faCheck} size="2x" class="text-success-500" />
+				<p class="flex-grow">{dto.partner.name} gave you a review!</p>
+				<Ratings value={dto.review.score} max={value.max}>
+					<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
+					<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
+				</Ratings>
+			</div>
+		{/if}
 	{:else if $userStore?.account_type === 'Customer' && dto?.conversation?.state === 'Accepted'}
 		<div class="card p-4 rounded-container-token flex gap-4 flex-col">
-			<p class="text-center">Leave a review for {dto?.partner.name}</p>
-			<Ratings
-				bind:value={value.current}
-				max={value.max}
-				interactive
-				on:icon={(event) => {
-					value.current = event.detail.index;
-				}}
-			>
-				<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
-				<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
-			</Ratings>
-			<button
-				class="btn variant-ghost"
-				on:click={() => {
-					api.post('/review', {
-						reviewer_id: $userStore?.id,
-						recipient_id: dto?.partner?.id,
-						score: value.current
-					});
-				}}>Submit Review</button
-			>
+			{#if !dto.review}
+				<p class="text-center">
+					Leave a review for {dto.partner.name}
+				</p>
+				<Ratings
+					bind:value={value.current}
+					max={value.max}
+					interactive
+					on:icon={(event) => {
+						value.current = event.detail.index;
+					}}
+				>
+					<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
+					<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
+				</Ratings>
+				<button
+					class="btn variant-ghost"
+					on:click={() => {
+						api
+							.post('/review', {
+								reviewer_id: $userStore?.id,
+								recipient_id: dto?.partner?.id,
+								score: value.current
+							})
+							.then((res) => res.data)
+							.then((review) => {
+								$conversationStore[conversation_id].review = review;
+							});
+					}}>Submit Review</button
+				>
+			{:else}
+				<p class="text-center">
+					You left a review for {dto.partner.name} of
+					{dto.review.score} / {value.max}
+				</p>
+				<Ratings value={dto.review.score} max={value.max}>
+					<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
+					<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
+				</Ratings>
+			{/if}
 		</div>
 	{:else if dto?.conversation?.state === 'Quoted'}
 		{#if currentMessage.attachments}

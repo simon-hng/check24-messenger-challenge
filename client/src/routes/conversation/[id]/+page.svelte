@@ -18,6 +18,8 @@
 	const limit = 10;
 
 	const loadPreviousMessages = async () => {
+		if (!messages?.length) return;
+
 		loadingPrevious = api
 			.get(`conversation/${data.id}/message`, {
 				params: {
