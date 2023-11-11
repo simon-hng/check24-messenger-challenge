@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Avatar, ProgressRadial } from '@skeletonlabs/skeleton';
+	import { Avatar, ProgressRadial, getModalStore } from '@skeletonlabs/skeleton';
 	import { Icon, ArrowLeft } from 'svelte-hero-icons';
 	import MessageBubble from './messageBubble.svelte';
 	import ActionBar from './actionBar.svelte';
