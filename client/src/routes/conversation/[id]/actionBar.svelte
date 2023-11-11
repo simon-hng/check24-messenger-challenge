@@ -120,8 +120,9 @@
 				class="btn variant-ghost"
 				on:click={() => {
 					api.post('/review', {
+						reviewer_id: $userStore?.id,
 						recipient_id: dto?.partner?.id,
-						rating: value.current
+						score: value.current
 					});
 				}}>Submit Review</button
 			>

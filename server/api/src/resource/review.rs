@@ -5,7 +5,7 @@ use service::Mutation;
 
 use crate::resource::auth::get_user_id;
 
-#[post("/")]
+#[post("")]
 pub async fn create_review(
     data: web::Data<AppState>,
     user: Identity,

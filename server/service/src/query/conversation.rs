@@ -56,6 +56,7 @@ impl Query {
             conversation,
             messages: Some(messages),
             partner: Some(partner.to_owned()),
+            review: None,
         };
 
         Ok(response)
@@ -88,10 +89,14 @@ impl Query {
                 .find(|partner| partner.id != user_id)
                 .unwrap();
 
+            let review =
+                Query::find_review_by_reviewer_and_recipient(db, user_id, partner.id).await?;
+
             response.push(entity::dto::conversation::ConversationDTO {
                 conversation: conversation.to_owned(),
                 messages: Some(messages),
                 partner: Some(partner.to_owned()),
+                review: Some(review),
             })
         }
 
