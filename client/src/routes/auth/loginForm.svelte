@@ -1,15 +1,28 @@
 <script lang="ts">
 	import { userStore } from '$lib/stores';
 	import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
+	import type { AxiosError } from 'axios';
 	import Fa from 'svelte-fa';
 	import { createForm } from 'svelte-forms-lib';
+	import * as yup from 'yup';
 
-	const { form, handleChange, handleSubmit } = createForm({
+	const validationSchema = yup.object().shape({
+		account_name: yup.string().min(1).required()
+	});
+
+	interface LoginOptions extends yup.InferType<typeof validationSchema> {}
+
+	const { form, handleChange, handleSubmit, errors } = createForm({
 		initialValues: {
-			name: ''
+			account_name: '',
+			server: undefined
 		},
-
-		onSubmit: async (values) => await userStore.login(values.name)
+		validationSchema,
+		onSubmit: async (user: LoginOptions) => {
+			userStore
+				.login(user.account_name)
+				.catch((err: AxiosError) => ($errors.server = (err.response?.data as string) ?? ''));
+		}
 	});
 </script>
 
@@ -19,19 +32,28 @@
 	</header>
 	<div class="space-y-2 p-4">
 		<label>
-			Name
+			Account name
 			<input
 				class="input py-2 px-4 mt-2"
-				placeholder="simonhng"
 				on:change={handleChange}
-				bind:value={$form.name}
+				bind:value={$form.account_name}
 			/>
 		</label>
+		{#if $errors.account_name}
+			<p class="text-error-500">
+				{$errors.account_name}
+			</p>
+		{/if}
 	</div>
 	<hr class="opacity-50" />
 	<footer class="card-footer pt-4 flex justify-between items-center">
-		<button type="submit" class="btn variant-filled gap-2"
-			><Fa icon={faRightToBracket} />Login</button
-		>
+		<button type="submit" class="btn variant-filled gap-2">
+			<Fa icon={faRightToBracket} />Login
+		</button>
+		{#if $errors.server}
+			<p class="text-error-500">
+				{$errors.server}
+			</p>
+		{/if}
 	</footer>
 </form>

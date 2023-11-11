@@ -8,15 +8,12 @@ import type { Writable } from 'svelte/store';
 const createUserStore = () => {
 	const store: Writable<Account | undefined> = browser ? localStore('auth') : writable();
 
-	const login = async (username: string) => {
-		const account = await api
+	const login = async (username: string): Promise<any> => {
+		return api
 			.post('/auth/login', {
 				account_name: username
 			})
-			.then((res) => res.data)
-			.catch((err) => console.error(err));
-
-		store.set(account);
+			.then((res) => store.set(res.data));
 	};
 
 	const logout = async () => {
