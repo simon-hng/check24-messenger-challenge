@@ -4,6 +4,7 @@ mod m20230915_172016_create_account;
 mod m20230915_210044_create_conversation;
 mod m20231104_162154_add_attachments_to_message;
 mod m20231107_134946_add_reviews;
+mod m20231111_141729_add_enquiries;
 
 pub struct Migrator;
 
@@ -15,6 +16,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230915_210044_create_conversation::Migration),
             Box::new(m20231104_162154_add_attachments_to_message::Migration),
             Box::new(m20231107_134946_add_reviews::Migration),
+            Box::new(m20231111_141729_add_enquiries::Migration),
         ]
     }
 }

@@ -9,6 +9,7 @@ pub mod app;
 pub mod conversation;
 pub mod conversation_account;
 pub mod dto;
+pub mod enquiry;
 pub mod file;
 pub mod message;
 pub mod review;

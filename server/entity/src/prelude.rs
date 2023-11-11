@@ -3,6 +3,7 @@
 pub use super::account::Entity as Account;
 pub use super::conversation::Entity as Conversation;
 pub use super::conversation_account::Entity as ConversationAccount;
+pub use super::enquiry::Entity as Enquiry;
 pub use super::file::Entity as File;
 pub use super::message::Entity as Message;
 pub use super::review::Entity as Review;
