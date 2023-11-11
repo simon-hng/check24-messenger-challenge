@@ -5,20 +5,29 @@
 	import { Avatar, getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
+	import { createQuery } from '@tanstack/svelte-query';
 
 	const modalStore = getModalStore();
 	const openCreateEnquiryModal = () => {
 		const modal: ModalSettings = {
 			type: 'component',
 			component: 'createEnquiry',
-			response: async () => {
-				console.log('modal');
+			response: async (formData) => {
+				await api.post('enquiry', {
+					...formData,
+					enquirer_id: $userStore?.id
+				});
+
+				$query.refetch();
 			}
 		};
 		modalStore.trigger(modal);
 	};
 
-	const enquiries = api.get('enquiry').then((res) => res.data);
+	const query = createQuery({
+		queryKey: ['enquiry'],
+		queryFn: () => api.get('enquiry').then((res) => res.data)
+	});
 </script>
 
 <div class="p-4 border-b border-surface-500 flex justify-between items-center">
@@ -32,12 +41,12 @@
 
 <section>
 	<ul class="list p-2">
-		{#await enquiries}
+		{#if $query.isLoading}
 			<div class="card placeholder h-32 rounded" />
 			<div class="card placeholder h-32 rounded" />
 			<div class="card placeholder h-32 rounded" />
-		{:then enquiries}
-			{#each enquiries as enquiry}
+		{:else if $query.isSuccess}
+			{#each $query.data as enquiry}
 				<div class="card">
 					<header class="card-header">
 						<h2 class="text-2xl mb-3">{enquiry.title}</h2>
@@ -50,22 +59,25 @@
 						<div class="flex gap-3">
 							<p>Enquiry created by {enquiry.enquirer_id}</p>
 						</div>
-						<button
-							class="btn variant-filled"
-							on:click={() => {
-								api
-									.post('conversation', {
-										partner_id: enquiry.enquirer_id
-									})
-									.then((res) => {
-										goto(res.data.id);
-									});
-							}}>Contact</button
-						>
+						{#if enquiry.enquirer_id !== $userStore?.id}
+							<button
+								class="btn variant-filled"
+								on:click={() => {
+									api
+										.post('conversation', {
+											partner_id: enquiry.enquirer_id
+										})
+										.then((res) => {
+											// TODO: invalidate conversationStore
+											goto(`conversation/${res.data.id}`);
+										});
+								}}>Contact</button
+							>
+						{/if}
 					</footer>
 				</div>
 			{/each}
-		{/await}
+		{/if}
 	</ul>
 </section>
 
