@@ -4,6 +4,5 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct NewConversation {
-    pub state: Option<ConversationState>,
     pub partner_id: Uuid,
 }

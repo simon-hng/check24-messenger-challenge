@@ -10,7 +10,7 @@ impl Mutation {
         user_id: Uuid,
     ) -> Result<entity::conversation::Model, DbErr> {
         let db_conversation = entity::conversation::ActiveModel {
-            state: Set(conversation.state.to_owned()),
+            state: Set(Some(ConversationState::Quoted {})),
             ..Default::default()
         }
         .insert(db)

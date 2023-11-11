@@ -86,10 +86,12 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Conversation::State).enumeration(
-                            ConversationState::Table,
-                            ConversationState::iter().skip(1),
-                        ),
+                        ColumnDef::new(Conversation::State)
+                            .enumeration(
+                                ConversationState::Table,
+                                ConversationState::iter().skip(1),
+                            )
+                            .not_null(),
                     )
                     .col(
                         ColumnDef::new(Conversation::CreatedAt)
