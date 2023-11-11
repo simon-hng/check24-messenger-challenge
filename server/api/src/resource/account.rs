@@ -1,31 +1,37 @@
-use actix_web::{error, get, web, Responder, Result};
+use actix_web::*;
 use entity::prelude::Account;
-use sea_orm::prelude::Uuid;
 use sea_orm::EntityTrait;
+use service::Mutation;
 
 use crate::AppState;
 
-#[get("/")]
+#[get("")]
 pub async fn list_accounts(data: web::Data<AppState>) -> Result<impl Responder> {
-    let accounts = Account::find()
-        .all(&data.conn)
-        .await
-        .expect("Failed to load accounts");
+    let accounts = Account::find().all(&data.conn).await.map_err(|err| {
+        error::ErrorInternalServerError(format!("Failed to list accounts: {}", err))
+    })?;
 
     Ok(web::Json(accounts))
 }
 
-#[get("/{id}")]
-pub async fn get_account_by_id(
+#[post("")]
+pub async fn create_account(
     data: web::Data<AppState>,
-    path: web::Path<Uuid>,
+    account: web::Json<entity::dto::account::CreateAccountDTO>,
 ) -> Result<impl Responder> {
-    let account_id = path.into_inner();
-
-    let account = Account::find_by_id(account_id)
-        .one(&data.conn)
+    let account = account.into_inner();
+    let db_account = Mutation::create_account(&data.conn, account)
         .await
-        .map_err(|err| error::ErrorInternalServerError(err))?;
+        .map_err(|err| {
+            error::ErrorInternalServerError(format!("Failed to create account: {}", err))
+        })?;
 
-    Ok(web::Json(account))
+    Ok(web::Json(db_account))
+}
+pub fn init_service(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/account")
+            .service(list_accounts)
+            .service(create_account),
+    );
 }

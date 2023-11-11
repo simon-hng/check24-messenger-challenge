@@ -59,6 +59,7 @@ pub async fn main() -> std::io::Result<()> {
                     .allow_any_origin()
                     .supports_credentials(),
             )
+            .configure(account::init_service)
             .configure(auth::init_service)
             .configure(conversation::init_service)
             .configure(notification::init_service)

@@ -3,7 +3,14 @@
 ## Run locally
 
 ```bash
+# Start the server
+cd server 
 docker-compose up -d
+
+# Start the client
+cd client
+npm install
+npm run dev
 ```
 
 ## Approach
