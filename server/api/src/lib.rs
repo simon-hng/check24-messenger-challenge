@@ -6,7 +6,7 @@ use actix_web::{cookie::Key, middleware, web, App, HttpServer};
 use dotenvy::dotenv;
 use entity::app::AppState;
 use migration::{Migrator, MigratorTrait};
-use resource::{auth, conversation, notification, review};
+use resource::*;
 use sea_orm::Database;
 use std::env;
 
@@ -63,6 +63,7 @@ pub async fn main() -> std::io::Result<()> {
             .configure(conversation::init_service)
             .configure(notification::init_service)
             .configure(review::init_service)
+            .configure(enquiry::init_service)
     })
     .bind("0.0.0.0:8080")?
     .run()

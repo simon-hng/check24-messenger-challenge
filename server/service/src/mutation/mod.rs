@@ -4,3 +4,4 @@ pub mod conversation;
 pub mod file;
 pub mod message;
 pub mod review;
+pub mod enquiry;
