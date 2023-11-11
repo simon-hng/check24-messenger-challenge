@@ -4,7 +4,7 @@ use crate::resource::auth::get_user_id;
 use crate::AppState;
 use actix_identity::Identity;
 use actix_web::*;
-use entity::active::NewConversation;
+use entity::dto::conversation::CreateConversationDTO;
 use sea_orm::prelude::Uuid;
 use service::{Mutation, Query};
 
@@ -12,7 +12,7 @@ use service::{Mutation, Query};
 async fn create_conversation(
     user: Identity,
     data: web::Data<AppState>,
-    new_conversation: web::Json<NewConversation>,
+    new_conversation: web::Json<CreateConversationDTO>,
 ) -> Result<impl Responder> {
     let user_id: Uuid = user
         .id()

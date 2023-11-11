@@ -3,7 +3,6 @@
 pub mod prelude;
 
 pub mod account;
-pub mod active;
 pub mod api;
 pub mod app;
 pub mod conversation;

@@ -6,7 +6,7 @@ use sea_orm::Set;
 impl Mutation {
     pub async fn create_conversation(
         db: &DatabaseConnection,
-        conversation: entity::active::NewConversation,
+        conversation: entity::dto::conversation::CreateConversationDTO,
         user_id: Uuid,
     ) -> Result<entity::conversation::Model, DbErr> {
         let db_conversation = entity::conversation::ActiveModel {
