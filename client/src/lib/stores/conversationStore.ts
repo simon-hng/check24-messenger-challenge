@@ -1,7 +1,8 @@
 import { api } from '$lib/api';
 import type { ConversationDTO, WSNotification } from '$lib/types';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { notificationStore } from './notificationStore';
+import { userStore } from './userStore';
 
 export const createConversationStore = () => {
 	const store = writable<Record<string, ConversationDTO>>();
@@ -20,7 +21,9 @@ export const createConversationStore = () => {
 			})
 			.catch((err) => console.error(err));
 
-	fetchConversations();
+	userStore.subscribe((user) => {
+		if (user) fetchConversations();
+	});
 
 	const notifyMessageRead = (notification: Extract<WSNotification, { type: 'Read' }>) => {
 		store.update((conversations) => {
