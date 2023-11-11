@@ -1,7 +1,7 @@
 use actix_web::*;
 use entity::prelude::Account;
 use sea_orm::EntityTrait;
-use service::Mutation;
+use service::{Mutation, Query};
 
 use crate::AppState;
 
@@ -20,6 +20,20 @@ pub async fn create_account(
     account: web::Json<entity::dto::account::CreateAccountDTO>,
 ) -> Result<impl Responder> {
     let account = account.into_inner();
+
+    let existing = Query::find_account_by_name(&data.conn, account.name.to_owned())
+        .await
+        .map_err(|err| {
+            error::ErrorInternalServerError(format!("Failed to find account by name: {}", err))
+        })?;
+
+    if existing.is_some() {
+        return Err(error::ErrorBadRequest(format!(
+            "Account with name {} already exists",
+            account.name
+        )));
+    }
+
     let db_account = Mutation::create_account(&data.conn, account)
         .await
         .map_err(|err| {
