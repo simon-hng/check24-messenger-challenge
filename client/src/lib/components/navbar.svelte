@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { userStore } from '$lib/stores';
 	import {
 		faMessage,
@@ -29,7 +30,13 @@
 					<Fa icon={faMessage} />
 					Conversation</a
 				>
-				<button on:click={userStore.logout} class="btn gap-2">
+				<button
+					on:click={async () => {
+						await userStore.logout();
+						goto('/auth');
+					}}
+					class="btn gap-2"
+				>
 					<Fa icon={faRightFromBracket} />
 					Logout
 				</button>
