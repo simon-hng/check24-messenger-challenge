@@ -9,7 +9,7 @@
 	const validationSchema = yup.object().shape({
 		name: yup.string().min(1).required(),
 		picture: yup.string().url(),
-		account_type: yup.string().oneOf(['Customer', ' ServiceProvider'])
+		account_type: yup.string().oneOf(['Customer', 'ServiceProvider'])
 	});
 
 	interface RegisterOptions extends yup.InferType<typeof validationSchema> {}
@@ -64,6 +64,11 @@
 				<option value="Customer" selected>Customer</option>
 				<option value="ServiceProvider">Service Provider</option>
 			</select>
+			{#if $errors.account_type}
+				<p class="text-error-500">
+					{$errors.account_type}
+				</p>
+			{/if}
 		</label>
 	</section>
 	<hr class="opacity-50" />
