@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { userStore } from '$lib/stores';
-	import { faLock, faMessage, faQuestion } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faMessage,
+		faQuestion,
+		faRightFromBracket,
+		faRightToBracket
+	} from '@fortawesome/free-solid-svg-icons';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import Fa from 'svelte-fa';
 </script>
@@ -15,18 +20,25 @@
 		</div>
 
 		<nav class="flex">
-			<a href="enquiry" class="btn gap-2">
-				<Fa icon={faQuestion} />
-				Enquiry</a
-			>
-			<a href="conversation" class="btn gap-2">
-				<Fa icon={faMessage} />
-				Conversation</a
-			>
-			<a href="auth" class="btn gap-2">
-				<Fa icon={faLock} />
-				Auth</a
-			>
+			{#if $userStore}
+				<a href="enquiry" class="btn gap-2">
+					<Fa icon={faQuestion} />
+					Enquiry</a
+				>
+				<a href="conversation" class="btn gap-2">
+					<Fa icon={faMessage} />
+					Conversation</a
+				>
+				<button on:click={userStore.logout} class="btn gap-2">
+					<Fa icon={faRightFromBracket} />
+					Logout
+				</button>
+			{:else}
+				<a href="auth" class="btn gap-2">
+					<Fa icon={faRightToBracket} />
+					Login</a
+				>
+			{/if}
 		</nav>
 	</div>
 </div>
