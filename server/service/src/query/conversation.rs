@@ -89,8 +89,7 @@ impl Query {
                 .find(|partner| partner.id != user_id)
                 .unwrap();
 
-            let review =
-                Query::find_review_by_reviewer_and_recipient(db, user_id, partner.id).await?;
+            let review = Query::find_review_by_conversation(db, conversation.id).await?;
 
             response.push(entity::dto::conversation::ConversationDTO {
                 conversation: conversation.to_owned(),

@@ -91,7 +91,7 @@
 
 <div bind:this={placeholder} />
 
-<div class="fixed bottom-0 w-full px-8 py-6" bind:clientHeight>
+<div class="fixed bottom-0 w-full px-8 py-6 gap-3 flex flex-col" bind:clientHeight>
 	{#if $userStore?.account_type === 'ServiceProvider' && dto?.conversation?.state === 'Rejected'}
 		<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
 			<Fa icon={faXmark} size="2x" class="text-error-500" />
@@ -105,9 +105,9 @@
 
 		{#if dto.review}
 			<div class="card p-4 rounded-container-token flex flex-row items-center gap-4">
-				<Fa icon={faCheck} size="2x" class="text-success-500" />
+				<Fa icon={faStarFilled} size="2x" class="text-yellow-500" />
 				<p class="flex-grow">{dto.partner.name} gave you a review!</p>
-				<Ratings value={dto.review.score} max={value.max}>
+				<Ratings value={dto.review.score} max={value.max} justify="justify-end">
 					<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>
 					<svelte:fragment slot="full"><Fa icon={faStarFilled} /></svelte:fragment>
 				</Ratings>
@@ -135,8 +135,7 @@
 					on:click={() => {
 						api
 							.post('/review', {
-								reviewer_id: $userStore?.id,
-								recipient_id: dto?.partner?.id,
+								conversation_id,
 								score: value.current
 							})
 							.then((res) => res.data)
@@ -147,8 +146,7 @@
 				>
 			{:else}
 				<p class="text-center">
-					You left a review for {dto.partner.name} of
-					{dto.review.score} / {value.max}
+					You left a review for {dto.partner.name}
 				</p>
 				<Ratings value={dto.review.score} max={value.max}>
 					<svelte:fragment slot="empty"><Fa icon={faStar} /></svelte:fragment>

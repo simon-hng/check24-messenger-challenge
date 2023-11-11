@@ -8,8 +8,7 @@ impl Mutation {
         review: entity::dto::review::ReviewDTO,
     ) -> Result<entity::review::Model, DbErr> {
         entity::review::ActiveModel {
-            reviewer_id: Set(review.reviewer_id),
-            recipient_id: Set(review.recipient_id),
+            conversation_id: Set(review.conversation_id),
             score: Set(review.score),
             ..Default::default()
         }

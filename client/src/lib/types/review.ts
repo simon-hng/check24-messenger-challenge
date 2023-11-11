@@ -1,6 +1,5 @@
 export interface Review {
     id: string,
-    reviewer_id: string,
-    recipient_id: string,
+    conversation_id: string,
     score: number,
 }

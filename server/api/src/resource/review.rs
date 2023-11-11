@@ -11,10 +11,8 @@ pub async fn create_review(
     user: Identity,
     review: web::Json<entity::dto::review::ReviewDTO>,
 ) -> Result<impl Responder> {
-    let user_id = get_user_id(user)?;
-
-    let mut review = review.into_inner();
-    review.reviewer_id = user_id;
+    let _user_id = get_user_id(user)?;
+    let review = review.into_inner();
 
     let db_review = Mutation::create_review(&data.conn, review)
         .await
