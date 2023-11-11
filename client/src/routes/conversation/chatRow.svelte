@@ -29,15 +29,15 @@
 			<h3 class="font-semibold text-xl">{dto?.partner?.name}</h3>
 			{#if lastMessage}
 				<div class="flex items-center">
+					{#if lastMessage.sender_id === $userStore?.id && lastMessage.read_at}
+						<Fa icon={faCheck} size="sm" class="mr-2" />
+					{/if}
 					<p class="text-sm overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
 						{#if lastMessage.sender_id === $userStore?.id}
 							You:
 						{/if}
 						{lastMessage.text ?? ''}
 					</p>
-					{#if lastMessage.sender_id === $userStore?.id && lastMessage.read_at}
-						<Fa icon={faCheck} size="sm" />
-					{/if}
 				</div>
 			{/if}
 		</div>
