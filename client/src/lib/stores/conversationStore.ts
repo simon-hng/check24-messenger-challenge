@@ -3,21 +3,24 @@ import type { ConversationDTO, WSNotification } from '$lib/types';
 import { writable } from 'svelte/store';
 import { notificationStore } from './notificationStore';
 
-const createConversationStore = () => {
+export const createConversationStore = () => {
 	const store = writable<Record<string, ConversationDTO>>();
 
-	api
-		.get('conversation')
-		.then((res) => res.data)
-		.then((dtos: ConversationDTO[]) => {
-			let conversationMap: Record<string, ConversationDTO> = {};
-			for (const dto of dtos) {
-				const conversationId = dto.conversation.id;
-				conversationMap[conversationId] = dto;
-			}
-			store.set(conversationMap);
-		})
-		.catch((err) => console.error(err));
+	const fetchConversations = () =>
+		api
+			.get('conversation')
+			.then((res) => res.data)
+			.then((dtos: ConversationDTO[]) => {
+				let conversationMap: Record<string, ConversationDTO> = {};
+				for (const dto of dtos) {
+					const conversationId = dto.conversation.id;
+					conversationMap[conversationId] = dto;
+				}
+				store.set(conversationMap);
+			})
+			.catch((err) => console.error(err));
+
+	fetchConversations();
 
 	const notifyMessageRead = (notification: Extract<WSNotification, { type: 'Read' }>) => {
 		store.update((conversations) => {
@@ -60,7 +63,7 @@ const createConversationStore = () => {
 		set: store.set,
 		update: store.update,
 		subscribe: store.subscribe,
-		notifyMessageRead
+		fetch: fetchConversations
 	};
 };
 

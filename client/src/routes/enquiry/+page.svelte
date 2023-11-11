@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { api } from '$lib/api';
-	import { userStore } from '$lib/stores';
+	import { conversationStore, userStore } from '$lib/stores';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
-	import { Avatar, getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
 	import { createQuery } from '@tanstack/svelte-query';
+	import Navbar from '$lib/components/navbar.svelte';
 
 	const modalStore = getModalStore();
 	const openCreateEnquiryModal = () => {
@@ -30,14 +31,7 @@
 	});
 </script>
 
-<div class="p-4 border-b border-surface-500 flex justify-between items-center">
-	<div class="flex items-center gap-3">
-		{#if $userStore?.picture}
-			<Avatar src={$userStore?.picture} width="w-12" rounded="rounded-full" />
-		{/if}
-		<h2 class="text-xl">Enquiries</h2>
-	</div>
-</div>
+<Navbar />
 
 <section>
 	<ul class="list p-2">
@@ -67,10 +61,9 @@
 										.post('conversation', {
 											partner_id: enquiry.enquirer_id
 										})
-										.then((res) => {
-											// TODO: invalidate conversationStore
-											goto(`conversation/${res.data.id}`);
-										});
+										.then((res) =>
+											conversationStore.fetch().then(() => goto(`conversation/${res.data.id}`))
+										);
 								}}>Contact</button
 							>
 						{/if}

@@ -5,5 +5,6 @@
 
 <section>
 	<a href="conversation">Conversations</a>
-	<a href="auth/login">login</a>
+	<a href="enquiry">Enquiry</a>
+	<a href="auth">login</a>
 </section>
