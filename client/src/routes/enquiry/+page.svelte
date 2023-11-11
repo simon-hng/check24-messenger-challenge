@@ -74,7 +74,9 @@
 	</ul>
 </section>
 
-<button class="mx-2 btn variant-soft" on:click={openCreateEnquiryModal}>
-	<Fa icon={faPlus} class="mr-2" />
-	Create new Enquiry
-</button>
+{#if $userStore?.account_type === 'Customer'}
+	<button class="mx-2 btn variant-soft" on:click={openCreateEnquiryModal}>
+		<Fa icon={faPlus} class="mr-2" />
+		Create new Enquiry
+	</button>
+{/if}
