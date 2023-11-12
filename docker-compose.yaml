@@ -1,17 +1,27 @@
 version: '3'
 
 services:
-  rust-app:
+  client:
     build:
-      context: .
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4173:4173"
+    environment:
+      PUBLIC_API_BASE_URL: "http://server:8080"
+
+  server:
+    build:
+      context: ./server
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - ./server/.env
     environment:
-      DATABASE_URL: "postgres://postgres_user:postgres_password@postgres:5432/your_database"
+      DATABASE_URL: "postgres://user:password@postgres:5432/database"
       REDIS_URL: "redis://redis:6379"
+      CLIENT_URL: "http://client:4173"
     depends_on:
       - postgres
       - redis
@@ -25,7 +35,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database/postgres/docker-entrypoint-initdb:/docker-entrypoint-initdb.d/
+      - ./server/database/postgres/docker-entrypoint-initdb:/docker-entrypoint-initdb.d/
 
   redis:
     image: redis:latest

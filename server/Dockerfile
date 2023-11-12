@@ -2,7 +2,7 @@
 FROM rust:bookworm as builder
 WORKDIR /code
 
-copy . .
+COPY . .
 RUN cargo build --release
 
 FROM debian:bookworm-slim
