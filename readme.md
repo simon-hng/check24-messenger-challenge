@@ -48,7 +48,6 @@ which persists them in the database and notifies recipients if they have an acti
 ## Future work
 
 - Authentication
-- Adding of inquiries
 - Bug fixes
 - Sent/Received receipts
 - Scalability
