@@ -3,15 +3,11 @@
 ## Run locally
 
 ```bash
-# Start the server
-cd server 
 docker-compose up -d
-
-# Start the client
-cd client
-npm install
-npm run dev
 ```
+
+Visit the client in `http://localhost:4173`. 
+You will need to create a new account.
 
 ## Approach
 
@@ -19,12 +15,12 @@ npm run dev
 
 I started this project with one goal:
 
-> use all the cool new technologies that I didn't use before.
+> Use all the cool new technologies that I didn't use before.
 
 We have a simple client/server architecture.
 Due to the requirement to send and receive notifications in real time, I decided to use websockets.
 
-Messages are sent to the application server with a rest api,
+Messages are sent to the application server with a rest API,
 which persists them in the database and notifies recipients if they have an active session.
 
 ### Lessons learned
@@ -41,6 +37,7 @@ which persists them in the database and notifies recipients if they have an acti
 
 ### Web client
 
+- [bun](https://bun.sh/) - JS Runtime, package manager, etc
 - [Svelte Kit](https://kit.svelte.dev/) - UI Framework
 - [TailwindCSS](https://tailwindcss.com/) - CSS Framework
 - [SkeletonUI](https://www.skeleton.dev/) - UI Library
